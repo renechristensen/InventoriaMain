@@ -1,0 +1,141 @@
+/* Create Inventoria database and star using it*/
+CREATE database IF NOT EXISTS Inventoria;
+USE Inventoria;
+
+/* Create Datacenter table if it does not exist */ 
+CREATE TABLE IF NOT EXISTS DataCenter (
+  DataCenterID INT PRIMARY KEY,
+  Name VARCHAR(255) not null,
+  Address VARCHAR(255) not null,
+  Description TEXT
+);
+
+
+CREATE TABLE IF NOT EXISTS ServerRoom (
+  ServerRoomID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataCenterID INT NOT NULL,
+  ServerRoomName VARCHAR(255) NOT NULL,
+  RackCapacity INT NOT NULL,
+  StartupDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (DataCenterID) REFERENCES DataCenter(DataCenterID)
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS DataRacks (
+  DataRackID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ServerRoomID INT NOT NULL,
+  RackPlacement TEXT NOT NULL,
+  TotalUnits INT NOT NULL,
+  AvailableUnits INT NOT NULL,
+  Status ENUM('Active', 'Inactive', 'Maintenance', 'Decommissioned') NOT NULL,
+  CreationDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (ServerRoomID) REFERENCES ServerRoom(ServerRoomID)
+);
+
+
+CREATE TABLE IF NOT EXISTS RackUnits (
+  RackUnitID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataRackID INT NOT NULL,
+  UnitNumber INT NOT NULL,
+  FOREIGN KEY (DataRackID) REFERENCES DataRacks(DataRackID)
+);
+
+
+CREATE TABLE IF NOT EXISTS Users (
+  UserID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Displayname VARCHAR(255) NOT NULL,
+  PasswordHash VARCHAR(255) NOT NULL,
+  StudieEmail VARCHAR(255) NOT NULL,
+  CreationDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  LastLoginDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS UserRole (
+  UserRoleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  UserID INT NOT NULL,
+  RoleID INT NOT NULL,
+  FOREIGN KEY (UserID) REFERENCES Users(UserID),
+  FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
+);
+
+CREATE TABLE IF NOT EXISTS Roles (
+  RoleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  RoleName VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Reservations (
+  ReservationID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  UserID INT NOT NULL,
+  StartDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  EndDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Background TEXT NOT NULL,
+  FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE IF NOT EXISTS ReservedRackUnit (
+  ReservedRackUnitID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ReservationID INT NOT NULL,
+  RackUnitID INT NOT NULL,
+  FOREIGN KEY (ReservationID) REFERENCES Reservations(ReservationID),
+  FOREIGN KEY (RackUnitID) REFERENCES RackUnits(RackUnitID)
+);
+
+CREATE TABLE IF NOT EXISTS Equipment (
+  EquipmentID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Name VARCHAR(255) NOT NULL,
+  Model VARCHAR(255) NOT NULL,
+  Type VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS EquipmentRackUnits (
+  EquipmentRackUnitID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  EquipmentID INT NOT NULL,
+  RackUnitID INT NOT NULL,
+  FOREIGN KEY (EquipmentID) REFERENCES Equipment(EquipmentID),
+  FOREIGN KEY (RackUnitID) REFERENCES RackUnits(RackUnitID)
+);
+
+CREATE TABLE IF NOT EXISTS EnvironmentalReadings (
+  EnvironmentalReadingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Temperature FLOAT NOT NULL,
+  Humidity FLOAT NOT NULL,
+  ReadingTimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS EnvironmentalSettings (
+  EnvironmentalSettingsID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ServerRoomID INT NOT NULL,
+  TemperatureUpperLimit FLOAT NOT NULL,
+  TemperatureLowerLimit FLOAT NOT NULL,
+  HumidityUpperLimit FLOAT NOT NULL,
+  HumidityLowerLimit FLOAT NOT NULL,
+  LatestChange TIMESTAMP,
+  FOREIGN KEY (ServerRoomID) REFERENCES ServerRoom(ServerRoomID)
+);
+
+CREATE TABLE IF NOT EXISTS AlertTypes (
+  AlertTypeID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  TypeName VARCHAR(255) NOT NULL,
+  Description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Alerts (
+  AlertID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  AlertTypeID INT NOT NULL,
+  ThresholdExceeded BOOL NOT NULL,
+  EnvironmentalReadingID INT NOT NULL,
+  AlertTimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Resolved BOOL NOT NULL,
+  FOREIGN KEY (EnvironmentalReadingID) REFERENCES EnvironmentalReadings(EnvironmentalReadingID),
+  FOREIGN KEY (AlertTypeID) REFERENCES AlertTypes(AlertTypeID)
+);
+
+CREATE TABLE IF NOT EXISTS RackAccessPermissions (
+  RackAccessPermissionID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataRackID INT NOT NULL,
+  RoleID INT NOT NULL,
+  FOREIGN KEY (DataRackID) REFERENCES DataRacks(DataRackID),
+  FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
+);
