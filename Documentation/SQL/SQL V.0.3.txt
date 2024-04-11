@@ -1,11 +1,14 @@
+//Changes in version 0.3. Added hashingpassword and hashingsalt to users table, with Binary 64
+
 /* Create Inventoria database and start using it */
 CREATE DATABASE IF NOT EXISTS Inventoria;
 USE Inventoria;
 
 /* Create database users */
-CREATE USER 'inventario' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON database_name.* TO 'inventario';
+CREATE USER IF NOT EXISTS 'inventarioUser'@'localhost' IDENTIFIED BY 'ha32iixs_';
+GRANT ALL PRIVILEGES ON inventoria.* TO 'inventarioUser'@'localhost';
 FLUSH PRIVILEGES;
+
 
 /* Company table */
 CREATE TABLE IF NOT EXISTS Company (
@@ -58,10 +61,11 @@ CREATE TABLE IF NOT EXISTS RackUnits (
 CREATE TABLE IF NOT EXISTS Users (
   UserID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Displayname VARCHAR(255) NOT NULL,
-  PasswordHash VARCHAR(255) NOT NULL,
+  PasswordHash BINARY(64) NOT NULL,
+  PasswordSalt BINARY(64) NOT NULL,
   StudieEmail VARCHAR(255) NOT NULL,
   CreationDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  LastLoginDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  LastLoginDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CompanyID INT,
   FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
 );
@@ -188,4 +192,3 @@ CREATE TABLE IF NOT EXISTS DataRacksChangeLog (
   FOREIGN KEY (DataRackID) REFERENCES DataRacks(DataRackID),
   FOREIGN KEY (ChangedByUserID) REFERENCES Users(UserID)
 );
-
