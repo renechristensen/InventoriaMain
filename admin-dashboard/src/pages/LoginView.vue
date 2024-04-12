@@ -21,7 +21,7 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue';
-import FooterBar from '@/components/FooterBar.vue';
+import FooterBar from '@/components/AppFooter.vue';
 import LoginPopup from '@/components/LoginPopup.vue';
 
 export default {
