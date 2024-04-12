@@ -1,0 +1,19 @@
+{
+  "passwordHash": "QHA49qxp?",
+  "studieEmail": "admin@edu.sde.dk"
+}
+
+ cd admin-dashboard
+vue run serve
+
+
+
+powershell -ExecutionPolicy Bypass
+yarn create vuetify
+project name admin-dashboard
+preset pick: Base (Default, Routing)
+use typescript: no
+who should install dependencies: yarn
+cd admin-dashboard
+yarn dev
+
