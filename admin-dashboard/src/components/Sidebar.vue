@@ -22,7 +22,7 @@
         v-for="item in menuItems"
         :key="item.title"
         link
-        @click="navigateTo(item.route)"
+        @click="handleNavigation(item.route, item.title)"
       >
         <template #prepend>
           <v-icon>{{ item.icon }}</v-icon>
@@ -36,9 +36,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAppStore } from '@/stores/app';
+import { useAuthStore } from '@/stores/auth'; // Using auth store for logout
 
-const appStore = useAppStore();
+const authStore = useAuthStore(); // Assuming authStore has logout logic
 const router = useRouter();
 
 const isExpanded = ref(true);
@@ -53,12 +53,17 @@ const menuItems = [
   { title: 'Logout', icon: 'mdi-exit-to-app', route: '/logout' },
 ];
 
-const navigateTo = (route) => {
-  router.push({ name: route });
+const handleNavigation = (route, title) => {
+  if (title === 'Logout') {
+    authStore.logout(); // Call logout from auth store
+  } else {
+    router.push({ name: route });
+  }
 };
 
 const sidebarWidth = computed(() => isExpanded.value ? '200px' : '70px');
 </script>
+
 
 <style scoped>
 .v-navigation-drawer {

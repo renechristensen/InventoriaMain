@@ -1,14 +1,17 @@
-// Utilities
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    isSidebarExpanded: localStorage.getItem("is_expanded") === "true" || false
+    isSidebarExpanded: localStorage.getItem("is_expanded") === "true" || false,
+    apiUrl: 'https://36c5-91-101-203-112.ngrok-free.app'
   }),
   actions: {
     toggleSidebar() {
       this.isSidebarExpanded = !this.isSidebarExpanded;
       localStorage.setItem("is_expanded", this.isSidebarExpanded);
+    },
+    setApiUrl(url) {
+      this.apiUrl = url;
     }
   }
 });

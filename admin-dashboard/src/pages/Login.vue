@@ -3,7 +3,6 @@
     <!-- Navigation Bar -->
     <v-app-bar app color="primary" dark>
       <v-toolbar-title>Inventoria</v-toolbar-title>
-      <v-spacer></v-spacer>
       <v-btn @click="authStore.openLoginPopup">Log ind</v-btn>
     </v-app-bar>
 

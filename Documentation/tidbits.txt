@@ -17,3 +17,9 @@ who should install dependencies: yarn
 cd admin-dashboard
 yarn dev
 
+{
+  "displayname": "Administrator",
+  "studieEmail": "admin@edu.sde.dk",
+  "password": "QHA49qxp?",
+  "companyID": 1
+}
