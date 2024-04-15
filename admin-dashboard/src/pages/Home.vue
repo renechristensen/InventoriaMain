@@ -11,33 +11,76 @@
             <v-btn @click="setActiveDataType('DataCenter')">Datacenter</v-btn>
             <v-btn @click="setActiveDataType('ServerRoom')">Serverrum</v-btn>
             <v-btn color="primary" @click="toggleDialog">Opret {{ activeTypeLabel }}</v-btn>
-          </div>
-
+        </div>
+        /*
           <div>
   {{ dataStore.data[activeType] }}
-</div>
+</div>*/
 
           <!-- Searchable Data Table -->
           <v-data-table 
-          :headers="headers[activeType]"
-          :items=dataStore.data[activeType]
-          :search="search" class="elevation-1">
+            :headers="headers[activeType]"
+            :items="dataStore.data[activeType]"
+            :search="search" 
+            class="elevation-1">
             <template #top>
               <v-text-field v-model="search" label="Search" class="mx-4"></v-text-field>
             </template>
           </v-data-table>
+
           <!-- Create Record Dialog -->
           <v-dialog v-model="dataStore.dialogIsActive" max-width="500px">
-            <v-card>
-              <v-card-title>Create {{ activeType }}</v-card-title>
-              <v-card-text>
-                <v-text-field label="Name" v-model="name" outlined></v-text-field>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
-                <v-btn color="primary" @click="saveData">Save</v-btn>
-              </v-card-actions>
-            </v-card>
+            <template v-if="activeType === 'DataRack'">
+              <v-card>
+                <v-card-title>Create DataRack</v-card-title>
+                <v-card-text>
+                  <v-text-field label="Name" v-model="name" outlined></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
+                  <v-btn color="primary" @click="saveData">Save</v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+            <template v-if="activeType === 'Company'">
+              <v-card>
+                <v-card-title>Create Company</v-card-title>
+                <v-card-text>
+                  <v-text-field label="Name" v-model="name" outlined></v-text-field>
+                  <v-text-field label="Description" v-model="description" outlined></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
+                  <v-btn color="primary" @click="saveData">Save</v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+            <template v-if="activeType === 'DataCenter'">
+              <v-card>
+                <v-card-title>Create DataCenter</v-card-title>
+                <v-card-text>
+                  <v-text-field label="Name" v-model="name" outlined></v-text-field>
+                  <v-text-field label="Address" v-model="address" outlined></v-text-field>
+                  <v-text-field label="Description" v-model="description" outlined></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
+                  <v-btn color="primary" @click="saveData">Save</v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+            <template v-if="activeType === 'ServerRoom'">
+              <v-card>
+                <v-card-title>Create ServerRoom</v-card-title>
+                <v-card-text>
+                  <v-text-field label="Name" v-model="name" outlined></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
+                  <v-btn color="primary" @click="saveData">Save</v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
           </v-dialog>
         </div>
       </v-col>
@@ -54,6 +97,8 @@ const dataStore = useDataStore();
 const activeType = ref('DataRack');
 const search = ref('');
 const name = ref('');
+const description = ref('');
+const address = ref('');
 
 const headers = computed(() => ({
   DataRack: [
@@ -87,12 +132,30 @@ function toggleDialog() {
   dataStore.toggleDialog();
 }
 
+watch(activeType, () => {
+  resetFields();
+});
+
+function resetFields() {
+  name.value = '';
+  description.value = '';
+  address.value = '';
+}
+
+
 function closeDialog() {
+  resetFields();
   dataStore.toggleDialog();
 }
 
 function saveData() {
-  // Save data logic here
+  // Logic to handle data saving based on activeType
+  const payload = {
+    name: name.value,
+    description: description.value,
+    address: address.value
+  };
+  dataStore.createData(activeType.value, payload);
   closeDialog();
 }
 </script>
