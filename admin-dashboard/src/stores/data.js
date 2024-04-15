@@ -20,14 +20,10 @@ export const useDataStore = defineStore('data', {
     },
     async fetchData(type) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}${type === 'DataRack' ? '/GetAll' + type + 'TableRecords' : ''}`;
+      // Assuming each type just appends to /api/{type}
+      const url = `${appStore.apiUrl}/api/${type}`;
       try {
-        const response = await axios.get(url, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'ngrok-skip-browser-warning': 'true'
-          }
-        });
+        const response = await axios.get(url);
         this.data[type] = response.data;
       } catch (error) {
         console.error('Fetch failed:', error);
@@ -37,14 +33,9 @@ export const useDataStore = defineStore('data', {
       const appStore = useAppStore();
       const url = `${appStore.apiUrl}/api/${type}`;
       try {
-        const response = await axios.post(url, payload, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'ngrok-skip-browser-warning': 'true'
-          }
-        });
+        const response = await axios.post(url, payload);
         console.log('Create successful:', response.data);
-        this.fetchData(type);
+        this.fetchData(type);  // Refresh the data list after a successful create
       } catch (error) {
         console.error('Create failed:', error);
       }
