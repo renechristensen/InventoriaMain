@@ -1,53 +1,49 @@
-// src/stores/data.js
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import router from '@/router';
 import { useAppStore } from './app';
 
-export const useDataStore = defineStore('data', {
+export const useAuthStore = defineStore('auth', {
   state: () => ({
-    activeType: 'DataRack',
-    data: {},
-    nameLists: {},
-    dialogIsActive: false, // State to manage dialog visibility
+    token: localStorage.getItem('token') || null,
+    isPopupOpen: false,
   }),
+  getters: {
+    isAuthenticated: (state) => !!state.token
+  },
   actions: {
-    setActiveType(type) {
-      this.activeType = type;
-      this.fetchData(type);
+    openLoginPopup() {
+      this.isPopupOpen = true;
     },
-    toggleDialog() {
-      this.dialogIsActive = !this.dialogIsActive;
+    closeLoginPopup() {
+      this.isPopupOpen = false;
     },
-    async fetchData(type) {
+    async login(studieEmail, passwordHash) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}${type === 'DataRack' ? '/GetAll' + type + 'TableRecords' : ''}`;
+      const loginUrl = `${appStore.apiUrl}/api/Login`;
       try {
-        const response = await axios.get(url, {
+        const response = await axios.post(loginUrl, {
+          StudieEmail: studieEmail,
+          PasswordHash: passwordHash
+        }, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'ngrok-skip-browser-warning': 'true'
+            'ngrok-skip-browser-warning': 'true' // Add this if needed for every API call
           }
         });
-        this.data[type] = response.data;
+        this.token = response.data.token;
+        localStorage.setItem('token', this.token);
+        router.push('/home');
+        this.closeLoginPopup();
       } catch (error) {
-        console.error('Fetch failed:', error);
+        console.error('Authentication failed:', error);
+        this.closeLoginPopup();
+        throw error;
       }
     },
-    async createData(type, payload) {
-      const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}`;
-      try {
-        const response = await axios.post(url, payload, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'ngrok-skip-browser-warning': 'true'
-          }
-        });
-        console.log('Create successful:', response.data);
-        this.fetchData(type);
-      } catch (error) {
-        console.error('Create failed:', error);
-      }
+    logout() {
+      this.token = null;
+      localStorage.removeItem('token');
+      router.push('/login');
     }
   }
 });

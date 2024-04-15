@@ -7,6 +7,11 @@
 vue run serve
 
 
+Starting ngrok
+ngrok http https://localhost:7027
+
+Setting up vue project
+
 
 powershell -ExecutionPolicy Bypass
 yarn create vuetify
@@ -15,7 +20,10 @@ preset pick: Base (Default, Routing)
 use typescript: no
 who should install dependencies: yarn
 cd admin-dashboard
+yarn add axios
 yarn dev
+
+Fast generate logintoken
 
 {
   "displayname": "Administrator",
@@ -23,3 +31,5 @@ yarn dev
   "password": "QHA49qxp?",
   "companyID": 1
 }
+
+remember to write Bearer before you write the token. Space between the two.
