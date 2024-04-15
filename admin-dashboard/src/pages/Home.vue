@@ -12,8 +12,16 @@
             <v-btn @click="setActiveDataType('ServerRoom')">Serverrum</v-btn>
             <v-btn color="primary" @click="toggleDialog">Opret {{ activeTypeLabel }}</v-btn>
           </div>
+
+          <div>
+  {{ dataStore.data[activeType] }}
+</div>
+
           <!-- Searchable Data Table -->
-          <v-data-table :headers="headers[activeType]" :items="dataStore.data[activeType]" :search="search" class="elevation-1">
+          <v-data-table 
+          :headers="headers[activeType]"
+          :items=dataStore.data[activeType]
+          :search="search" class="elevation-1">
             <template #top>
               <v-text-field v-model="search" label="Search" class="mx-4"></v-text-field>
             </template>
@@ -47,14 +55,26 @@ const activeType = ref('DataRack');
 const search = ref('');
 const name = ref('');
 
-const headers = computed(() => {
-  return {
-    DataRack: [{ text: 'DataRack ID', value: 'id' }],
-    Company: [{ text: 'Company ID', value: 'id' }],
-    DataCenter: [{ text: 'DataCenter ID', value: 'id' }],
-    ServerRoom: [{ text: 'ServerRoom ID', value: 'id' }]
-  };
-});
+const headers = computed(() => ({
+  DataRack: [
+    { title: 'DataRack ID', key: 'DataRackID' }
+  ],
+  Company: [
+    { title: 'Virksomheds ID', key: 'companyID' },
+    { title: 'Navn', key: 'name' },
+    { title: 'Beskrivelse', key: 'description' }
+  ],
+  DataCenter: [
+    { title: 'DataCenter ID', key: 'dataCenterID' },
+    { title: 'Navn', key: 'name' },
+    { title: 'Adresse', key: 'address' },
+    { title: 'Beskrivelse', key: 'description' },
+    { title: 'Virksomheds ID', key: 'companyID' }
+  ],
+  ServerRoom: [
+    { title: 'ServerRoom ID', key: 'id' }
+  ]
+}));
 
 const activeTypeLabel = computed(() => activeType.value);
 
