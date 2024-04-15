@@ -12,9 +12,9 @@ import App from './App.vue'
 
 // Composables
 import { createApp } from 'vue'
-
+import { setupAxiosInterceptors } from './axiosSetup'; 
 const app = createApp(App)
 
 registerPlugins(app)
-
+setupAxiosInterceptors();
 app.mount('#app')
