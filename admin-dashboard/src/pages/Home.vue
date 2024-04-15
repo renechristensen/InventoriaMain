@@ -42,6 +42,8 @@
                 </v-card-actions>
               </v-card>
             </template>
+            
+
             <template v-if="activeType === 'Company'">
               <v-card>
                 <v-card-title>Create Company</v-card-title>
@@ -55,6 +57,7 @@
                 </v-card-actions>
               </v-card>
             </template>
+
             <template v-if="activeType === 'DataCenter'">
               <v-card>
                 <v-card-title>Create DataCenter</v-card-title>
@@ -62,6 +65,13 @@
                   <v-text-field label="Name" v-model="name" outlined></v-text-field>
                   <v-text-field label="Address" v-model="address" outlined></v-text-field>
                   <v-text-field label="Description" v-model="description" outlined></v-text-field>
+                  <v-select
+                    label="Select Company"
+                    :items="companyItems"
+                    item-title="name"
+                    v-model="selectedCompanyID"
+                    outlined
+                  ></v-select>
                 </v-card-text>
                 <v-card-actions>
                   <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
@@ -69,6 +79,7 @@
                 </v-card-actions>
               </v-card>
             </template>
+
             <template v-if="activeType === 'ServerRoom'">
               <v-card>
                 <v-card-title>Create ServerRoom</v-card-title>
@@ -89,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Sidebar from '@/components/Sidebar';
 import { useDataStore } from '@/stores/data';
 
@@ -99,6 +110,15 @@ const search = ref('');
 const name = ref('');
 const description = ref('');
 const address = ref('');
+const selectedCompanyID = ref(null);
+
+const companyItems = computed(() => {
+  return dataStore.data['Company']?.map(company => ({
+    name: company.name,
+    companyID: company.companyID
+  })) || [];
+});
+
 
 const headers = computed(() => ({
   DataRack: [
@@ -130,9 +150,20 @@ function setActiveDataType(type) {
 
 function toggleDialog() {
   dataStore.toggleDialog();
+  if (activeType.value === 'DataCenter' && dataStore.dialogIsActive) {
+    dataStore.fetchData('Company');
+  }
+}
+
+function closeDialog() {
+  dataStore.toggleDialog();
+  resetFields();
 }
 
 watch(activeType, () => {
+  if (activeType.value === 'DataCenter') {
+    dataStore.fetchData('Company');
+  }
   resetFields();
 });
 
@@ -140,12 +171,7 @@ function resetFields() {
   name.value = '';
   description.value = '';
   address.value = '';
-}
-
-
-function closeDialog() {
-  resetFields();
-  dataStore.toggleDialog();
+  selectedCompanyID.value = null;
 }
 
 function saveData() {
