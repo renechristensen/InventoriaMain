@@ -5,6 +5,7 @@
  */
 
 // Composables
+import { useAuthStore } from '@/stores/auth'
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { setupLayouts } from 'virtual:generated-layouts'
 
@@ -14,3 +15,4 @@ const router = createRouter({
 })
 
 export default router
+
