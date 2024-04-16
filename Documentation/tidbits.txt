@@ -33,3 +33,15 @@ Fast generate logintoken
 }
 
 remember to write Bearer before you write the token. Space between the two.
+
+Create datarack data
+
+{
+  "datarackName": "Rack NR 1",
+  "serverRoomID": 1,
+  "rackPlacement": "Første Række",
+  "totalUnits": 42,
+  "availableUnits": 42,
+  "status": "Aktiv"
+}
+
