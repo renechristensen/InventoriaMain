@@ -33,7 +33,12 @@ export const useDataStore = defineStore('data', {
       const appStore = useAppStore();
       const url = `${appStore.apiUrl}/api/${type}`;
       try {
-        const response = await axios.post(url, payload);
+        const response = await axios.post(url, payload, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
         console.log('Create successful:', response.data);
         this.fetchData(type);  // Refresh the data list after a successful create
       } catch (error) {

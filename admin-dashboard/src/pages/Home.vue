@@ -109,6 +109,7 @@
                     label="Vælg datacenter"
                     :items="dataCenterItems"
                     item-title="DataCenterName"
+                    item-value="datacenterID"
                     v-model="selectedDataCenterID"
                     outlined
                   ></v-select>
@@ -207,26 +208,30 @@ const headers = computed(() => ({
     { title: 'Opstart', key: 'rackStartupDate' },
     { title: 'Status', key: 'rackStatus' },
     { title: 'Højde(U)', key: 'totalUnits' },
-    { title: 'Ledige', key: 'availableUnits' }
+    { title: 'Ledige', key: 'availableUnits' },
+    { title: 'Actions', key: 'actions', sortable: false }
   ],
   Company: [
     //{ title: 'Virksomheds ID', key: 'companyID' },
     { title: 'Navn', key: 'name' },
-    { title: 'Beskrivelse', key: 'description' }
+    { title: 'Beskrivelse', key: 'description' },
+    { title: 'Actions', key: 'actions', sortable: false }
   ],
   DataCenter: [
     //{ title: 'DataCenter ID', key: 'dataCenterID' },
     { title: 'Navn', key: 'name' },
     { title: 'Adresse', key: 'address' },
     { title: 'Beskrivelse', key: 'description' },
-    { title: 'Virksomheds ID', key: 'companyID' }
+    { title: 'Virksomheds ID', key: 'companyID' },
+    { title: 'Actions', key: 'actions', sortable: false }
   ],
   ServerRoom: [
     //{ title: 'ServerRoom ID', key: 'id' },
     { title: "Lokation", key: 'dataCenterName'},
     { title: 'Navn', key: 'serverRoomName'}, 
     { title: 'Opstart', key: 'startupDate'},
-    { title: 'Rack kapacitet', key: 'rackCapacity'}
+    { title: 'Rack kapacitet', key: 'rackCapacity'},
+    { title: 'Actions', key: 'actions', sortable: false }
 
   ]
 }));
@@ -321,10 +326,10 @@ function saveData() {
 
     case 'ServerRoom':
       payload = {
-        DataCenterID: selectedDataCenterID.value,
-        ServerRoomName: ServerRoomRackCapacity.value,
-        RackCapacity: ServerRoomRackCapacity.value,
-        StartupDate: new Date()
+        dataCenterID: selectedDataCenterID.value,
+        serverRoomName: ServerRoomName.value,
+        rackCapacity: parseInt(ServerRoomRackCapacity.value, 10),
+        startupDate: new Date().toISOString()
       };
       break;
   }
