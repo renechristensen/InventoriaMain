@@ -67,7 +67,7 @@
                 <v-card-title>Create Company</v-card-title>
                 <v-card-text>
                   <v-text-field label="Navn" v-model="CompanyName" outlined></v-text-field>
-                  <v-text-field label="Description" v-model="CompanyDescription" outlined></v-text-field>
+                  <v-text-field label="Beskriv virksomhed" v-model="CompanyDescription" outlined></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                   <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
@@ -79,7 +79,7 @@
             <!-- Create DataCenter -->
             <template v-if="activeType === 'DataCenter'">
               <v-card>
-                <v-card-title>Create DataCenter</v-card-title>
+                <v-card-title>Opret DataCenter</v-card-title>
                 <v-card-text>
                   <v-text-field label="Navn" v-model="DataCenterName" outlined></v-text-field>
                   <v-text-field label="Addresse" v-model="DataCenterAddresse" outlined></v-text-field>
@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted  } from 'vue';
 import Sidebar from '@/components/Sidebar';
 import { useDataStore } from '@/stores/data';
 
@@ -158,6 +158,13 @@ const selectedDataCenterID = ref(null);
 const DataCenterName = ref('');
 const DataCenterAddresse = ref('');
 const DataCenterBeskrivelse = ref('')
+
+onMounted(() => {
+  setActiveDataType('DataCenter');
+  setActiveDataType('ServerRoom');
+  setActiveDataType('Company');
+  setActiveDataType('DataRack');
+});
 
 const companyItems = computed(() => {
   return dataStore.data['Company']?.map(company => ({
