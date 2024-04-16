@@ -57,8 +57,23 @@ export const useDataStore = defineStore('data', {
       } catch (error) {
         console.error('Delete failed:', error);
       }
+    },
+    async updateData(type, payload) {
+      const appStore = useAppStore();
+      const url = `${appStore.apiUrl}/api/${type}/${payload.id}`;
+    
+      try {
+        const response = await axios.put(url, payload, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        console.log('Update successful:', response.data);
+        this.fetchData(type);
+      } catch (error) {
+        console.error('Update failed:', error);
+      }
     }
-    
-    
   }
 });

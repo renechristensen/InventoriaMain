@@ -357,11 +357,38 @@ function saveData() {
       });
   }
 }
-
-
-function editItem(item) {
+function editItemOldLegacy(item) {
   console.log('Edit item:', item);
 }
+function editItem(item) {
+  switch (activeType.value) {
+    case 'DataRack':
+      DataRackName.value = item.datarackName;
+      selectedServerRoomID.value = item.serverRoomID;
+      DataRackPlacement.value = item.rackPlacement;
+      HeightOfDataRack.value = item.totalUnits;
+      availableDataRackUnits.value = item.availableUnits;
+      DatarackStatus.value = item.status;
+      break;
+    case 'Company':
+      CompanyName.value = item.name;
+      CompanyDescription.value = item.description;
+      break;
+    case 'DataCenter':
+      DataCenterName.value = item.name;
+      DataCenterAddresse.value = item.address;
+      DataCenterBeskrivelse.value = item.description;
+      selectedCompanyID.value = item.companyID;
+      break;
+    case 'ServerRoom':
+      selectedDataCenterID.value = item.dataCenterID;
+      ServerRoomName.value = item.serverRoomName;
+      ServerRoomRackCapacity.value = item.rackCapacity;
+      break;
+  }
+  toggleDialog(); // Open the dialog with populated data
+}
+
 
 function deleteItem(item) {
   const confirmDelete = confirm(`Are you sure you want to delete this ${activeType.value}? This cannot be undone.`);
