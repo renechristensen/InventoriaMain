@@ -133,7 +133,8 @@ const companyItems = computed(() => {
 
 const headers = computed(() => ({
   DataRack: [
-    { title: 'ID', key: 'dataRackID' },
+    { title: "Navn", key: 'datarackName'},
+    //{ title: 'ID', key: 'dataRackID' },
     { title: 'Server lokale', key: 'serverRoomName' },
     { title: 'Startup', key: 'rackStartupDate' },
     { title: 'Status', key: 'rackStatus' },
@@ -143,19 +144,24 @@ const headers = computed(() => ({
     { title: 'Virksomhed', key: 'companyName' }
   ],
   Company: [
-    { title: 'Virksomheds ID', key: 'companyID' },
+    //{ title: 'Virksomheds ID', key: 'companyID' },
     { title: 'Navn', key: 'name' },
     { title: 'Beskrivelse', key: 'description' }
   ],
   DataCenter: [
-    { title: 'DataCenter ID', key: 'dataCenterID' },
+    //{ title: 'DataCenter ID', key: 'dataCenterID' },
     { title: 'Navn', key: 'name' },
     { title: 'Adresse', key: 'address' },
     { title: 'Beskrivelse', key: 'description' },
     { title: 'Virksomheds ID', key: 'companyID' }
   ],
   ServerRoom: [
-    { title: 'ServerRoom ID', key: 'id' }
+    //{ title: 'ServerRoom ID', key: 'id' },
+    { title: "Lokation", key: 'dataCenterName'},
+    { title: 'Navn', key: 'serverRoomName'}, 
+    { title: 'Opstart', key: 'startupDate'},
+    { title: 'Rack kapacitet', key: 'rackCapacity'}
+
   ]
 }));
 
