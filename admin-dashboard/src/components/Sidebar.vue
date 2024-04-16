@@ -47,9 +47,9 @@ const toggleSidebar = () => {
 };
 
 const menuItems = [
-  { title: 'Hjem', icon: 'mdi-view-dashboard', route: '/dashboard' },
-  { title: 'Maskiner', icon: 'mdi-cog', route: '/settings' },
-  { title: 'Brugere', icon: 'mdi-account', route: '/profile' },
+  { title: 'Hjem', icon: 'mdi-view-dashboard', route: '/home' },
+  { title: 'Maskiner', icon: 'mdi-cog', route: '/machines' },
+  { title: 'Brugere', icon: 'mdi-account', route: '/users' },
   { title: 'Logout', icon: 'mdi-exit-to-app', route: '/logout' },
 ];
 
