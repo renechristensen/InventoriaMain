@@ -40,10 +40,25 @@ export const useDataStore = defineStore('data', {
         });
 
         console.log('Create successful:', response.data);
-        this.fetchData(type);  // Refresh the data list after a successful create
+        this.fetchData(type);  
       } catch (error) {
         console.error('Create failed:', error);
       }
+    },
+    async deleteData(type, id, idKey) {
+      const appStore = useAppStore();
+      const url = `${appStore.apiUrl}/api/${type}/${id}`;
+    
+      try {
+        await axios.delete(url);
+        // Filter out the deleted item from the state
+        this.data[type] = this.data[type].filter(item => item[idKey] !== id);
+        console.log('Delete successful');
+      } catch (error) {
+        console.error('Delete failed:', error);
+      }
     }
+    
+    
   }
 });

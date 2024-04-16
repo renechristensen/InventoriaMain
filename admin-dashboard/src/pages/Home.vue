@@ -364,8 +364,40 @@ function editItem(item) {
 }
 
 function deleteItem(item) {
-  console.log('Delete item:', item);
+  const confirmDelete = confirm(`Are you sure you want to delete this ${activeType.value}? This cannot be undone.`);
+  if (confirmDelete) {
+    let idKey;
+    switch (activeType.value) {
+      case 'DataRack':
+        idKey = 'dataRackID';
+        break;
+      case 'Company':
+        idKey = 'companyID';
+        break;
+      case 'DataCenter':
+        idKey = 'dataCenterID';
+        break;
+      case 'ServerRoom':
+        idKey = 'serverRoomID';
+        break;
+      default:
+        console.error('Unsupported type for deletion');
+        return;
+    }
+
+    // Pass idKey to the deleteData action
+    dataStore.deleteData(activeType.value, item[idKey], idKey)
+      .then(() => {
+        console.log('Item deleted successfully');
+      })
+      .catch(error => {
+        console.error('Error deleting item:', error);
+      });
+  }
 }
+
+
+
 
 function viewDetails(item) {
   console.log('View details for item:', item);
