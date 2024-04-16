@@ -28,13 +28,17 @@
             </template>
           </v-data-table>
 
-          <!-- Create Record Dialog -->
+          <!-- Create DataRack -->
           <v-dialog v-model="dataStore.dialogIsActive" max-width="500px">
             <template v-if="activeType === 'DataRack'">
               <v-card>
                 <v-card-title>Create DataRack</v-card-title>
                 <v-card-text>
-                  <v-text-field label="Name" v-model="name" outlined></v-text-field>
+                  <v-text-field label="Server Room ID" v-model="serverRoomID" outlined type="number"></v-text-field>
+                  <v-text-field label="Rack Placement" v-model="rackPlacement" outlined></v-text-field>
+                  <v-text-field label="Total Units" v-model="totalUnits" outlined type="number"></v-text-field>
+                  <v-text-field label="Available Units" v-model="availableUnits" outlined type="number"></v-text-field>
+                  <v-text-field label="Status" v-model="status" outlined></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                   <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
@@ -42,8 +46,8 @@
                 </v-card-actions>
               </v-card>
             </template>
-            
 
+            <!-- Create Company -->
             <template v-if="activeType === 'Company'">
               <v-card>
                 <v-card-title>Create Company</v-card-title>
@@ -58,6 +62,7 @@
               </v-card>
             </template>
 
+            <!-- Create DataCenter -->
             <template v-if="activeType === 'DataCenter'">
               <v-card>
                 <v-card-title>Create DataCenter</v-card-title>
@@ -80,6 +85,7 @@
               </v-card>
             </template>
 
+          <!-- Create ServerRoom -->
             <template v-if="activeType === 'ServerRoom'">
               <v-card>
                 <v-card-title>Create ServerRoom</v-card-title>
@@ -111,6 +117,11 @@ const name = ref('');
 const description = ref('');
 const address = ref('');
 const selectedCompanyID = ref(null);
+const serverRoomID = ref('');
+const rackPlacement = ref('');
+const totalUnits = ref('');
+const availableUnits = ref('');
+const status = ref('');
 
 const companyItems = computed(() => {
   return dataStore.data['Company']?.map(company => ({
@@ -122,7 +133,14 @@ const companyItems = computed(() => {
 
 const headers = computed(() => ({
   DataRack: [
-    { title: 'DataRack ID', key: 'DataRackID' }
+    { title: 'ID', key: 'dataRackID' },
+    { title: 'Server lokale', key: 'serverRoomName' },
+    { title: 'Startup', key: 'rackStartupDate' },
+    { title: 'Status', key: 'rackStatus' },
+    { title: 'Højde(U)', key: 'totalUnits' },
+    { title: 'Ledige', key: 'availableUnits' },
+    { title: 'Data Center', key: 'dataCenterName' },
+    { title: 'Virksomhed', key: 'companyName' }
   ],
   Company: [
     { title: 'Virksomheds ID', key: 'companyID' },
@@ -172,18 +190,64 @@ function resetFields() {
   description.value = '';
   address.value = '';
   selectedCompanyID.value = null;
+  serverRoomID.value = '';
+  rackPlacement.value = '';
+  totalUnits.value = '';
+  availableUnits.value = '';
+  status.value = '';
 }
 
 function saveData() {
-  // Logic to handle data saving based on activeType
-  const payload = {
-    name: name.value,
-    description: description.value,
-    address: address.value
-  };
-  dataStore.createData(activeType.value, payload);
-  closeDialog();
+  let payload;
+
+  switch (activeType.value) {
+    case 'Company':
+      payload = {
+        Name: name.value,
+        Description: description.value
+      };
+      break;
+
+    case 'DataCenter':
+      payload = {
+        Name: name.value,
+        Address: address.value,
+        Description: description.value,
+        CompanyID: selectedCompanyID.value
+      };
+      break;
+
+    case 'DataRack':
+      payload = {
+        ServerRoomID: serverRoomID.value,
+        RackPlacement: rackPlacement.value,
+        TotalUnits: totalUnits.value,
+        AvailableUnits: availableUnits.value,
+        Status: status.value
+      };
+      break;
+
+    case 'ServerRoom':
+      payload = {
+        DataCenterID: selectedCompanyID.value, // Assuming 'selectedCompanyID' holds DataCenterID for ServerRoom
+        ServerRoomName: name.value,
+        RackCapacity: totalUnits.value, // Assuming 'totalUnits' holds RackCapacity for ServerRoom
+        StartupDate: new Date() // Assuming the startup date is the current date
+      };
+      break;
+  }
+
+  if (payload) {
+    dataStore.createData(activeType.value, payload)
+      .then(() => {
+        closeDialog();
+      })
+      .catch(error => {
+        console.error('Save failed:', error);
+      });
+  }
 }
+
 </script>
 
 <style scoped>
