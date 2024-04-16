@@ -45,7 +45,7 @@
           <v-dialog v-model="dataStore.dialogIsActive" max-width="500px">
             <template v-if="activeType === 'DataRack'">
               <v-card>
-                <v-card-title>Opret ny data rack</v-card-title>
+                <v-card-title>{{ dialogTitle }}</v-card-title>
                 <v-card-text>
                   <v-text-field label="Data rack titel" v-model="DataRackName" outlined></v-text-field>
                   <v-select
@@ -77,7 +77,7 @@
             <!-- Create Company -->
             <template v-if="activeType === 'Company'">
               <v-card>
-                <v-card-title>Create Company</v-card-title>
+                <v-card-title>{{ dialogTitle }}</v-card-title>
                 <v-card-text>
                   <v-text-field label="Navn" v-model="CompanyName" outlined></v-text-field>
                   <v-text-field label="Beskriv virksomhed" v-model="CompanyDescription" outlined></v-text-field>
@@ -92,7 +92,7 @@
             <!-- Create DataCenter -->
             <template v-if="activeType === 'DataCenter'">
               <v-card>
-                <v-card-title>Opret DataCenter</v-card-title>
+                <v-card-title>{{ dialogTitle }}</v-card-title>
                 <v-card-text>
                   <v-text-field label="Navn" v-model="DataCenterName" outlined></v-text-field>
                   <v-text-field label="Addresse" v-model="DataCenterAddresse" outlined></v-text-field>
@@ -116,7 +116,7 @@
           <!-- Create ServerRoom -->
             <template v-if="activeType === 'ServerRoom'">
               <v-card>
-                <v-card-title>Opret server rum</v-card-title>
+                <v-card-title>{{ dialogTitle }}</v-card-title>
                 <v-card-text>
                   <v-select
                     label="Vælg datacenter"
@@ -151,7 +151,8 @@ import { useDataStore } from '@/stores/data';
 const dataStore = useDataStore();
 const activeType = ref('DataRack');
 const search = ref('');
-
+const isEditMode = ref(false);
+const editID = ref(null);
 
 const selectedDatarackID = ref(null);
 const HeightOfDataRack = ref('');
@@ -181,20 +182,16 @@ onMounted(() => {
   setActiveDataType('DataRack');
 });
 
+const statusItems = ['Aktiv', 'Inaktiv', 'Vedligeholdelse', 'Lukket ned'];
+
 const companyItems = computed(() => {
   return dataStore.data['Company']?.map(company => ({
     companyName: company.name,
     companyID: company.companyID
   })) || [];
 });
-/*
-const datarackItems = computed(() => {
-  return dataStore.data['DataRack']?.map(datarack => ({
-    name: datarack.datarackName,
-    datarackID: datarack.datarackID
-  })) || [];
-});
-*/
+
+
 const serverRoomItems = computed(() => {
   return dataStore.data['ServerRoom']?.map(ServerRoom => ({
     serverRoomID: ServerRoom.serverRoomID,
@@ -209,10 +206,23 @@ const dataCenterItems = computed(() => {
   })) || [];
 });
 
-const statusItems = ['Aktiv', 'Inaktiv', 'Vedligeholdelse', 'Lukket ned'];
+const dialogTitle = computed(() => {
+  const typeTitles = {
+    'DataRack': 'data rack',
+    'Company': 'virksomhed',
+    'DataCenter': 'datacenter',
+    'ServerRoom': 'serverrum'
+  };
+  
+  const action = isEditMode.value ? 'Rediger' : 'Opret';
+  const typeLabel = typeTitles[activeType.value];
+
+  return `${action} ${typeLabel}`;
+});
 
 const headers = computed(() => ({
   DataRack: [
+    { title: 'Placering', key: 'rackPlacement'},
     { title: 'Virksomhed', key: 'companyName' },
     { title: 'Data Center', key: 'dataCenterName' },
     { title: 'Server lokale', key: 'serverRoomName' },
@@ -249,6 +259,13 @@ const headers = computed(() => ({
   ]
 }));
 
+const idFieldMapping = {
+  DataRack: 'dataRackID',
+  Company: 'companyID',
+  DataCenter: 'dataCenterID',
+  ServerRoom: 'serverRoomID'
+};
+
 const activeTypeLabel = computed(() => activeType.value);
 
 function setActiveDataType(type) {
@@ -257,16 +274,15 @@ function setActiveDataType(type) {
 }
 
 function toggleDialog() {
-  dataStore.toggleDialog();
-  if (activeType.value === 'DataCenter' && dataStore.dialogIsActive) {
-    dataStore.fetchData('Company');
-  }
+  dataStore.dialogIsActive = !dataStore.dialogIsActive;
 }
 
 function closeDialog() {
-  dataStore.toggleDialog();
+  isEditMode.value = false;
   resetFields();
+  dataStore.toggleDialog();
 }
+
 
 watch(selectedServerRoomID, (newVal) => {
   console.log('Selected Server Room ID:', newVal);
@@ -283,6 +299,13 @@ watch(activeType, () => {
   resetFields();
 });
 
+watch(() => dataStore.dialogIsActive, (newValue, oldValue) => {
+  if (!newValue) {
+    isEditMode.value = false;
+    resetFields();
+    console.log("Dialog closed");
+  }
+});
 function resetFields() {
   selectedDatarackID.value = null;
   HeightOfDataRack.value = '';
@@ -307,68 +330,86 @@ function resetFields() {
 }
 
 function saveData() {
-  let payload;
+  let payload = {};
 
   switch (activeType.value) {
-    case 'Company':
+    case 'DataRack':
       payload = {
-        Name: CompanyName.value,
-        Description: CompanyDescription.value
+        id: editID.value,
+        datarackName: DataRackName.value,
+        serverRoomID: selectedServerRoomID.value,
+        rackPlacement: DataRackPlacement.value,
+        totalUnits: HeightOfDataRack.value,
+        availableUnits: availableDataRackUnits.value,
+        status: DatarackStatus.value
       };
       break;
-
+    case 'Company':
+      payload = {
+        id: editID.value,
+        name: CompanyName.value,
+        description: CompanyDescription.value
+      };
+      break;
     case 'DataCenter':
       payload = {
+        id: editID.value,
         name: DataCenterName.value,
         address: DataCenterAddresse.value,
         description: DataCenterBeskrivelse.value,
         companyID: selectedCompanyID.value
       };
       break;
-
-    case 'DataRack':
-      payload = {
-        'datarackName': DataRackName.value,
-        'serverRoomID': selectedServerRoomID.value,
-        'rackPlacement': DataRackPlacement.value,
-        'totalUnits': HeightOfDataRack.value,
-        'availableUnits': availableDataRackUnits.value,
-        'status': DatarackStatus.value
-      };
-      break;
-
     case 'ServerRoom':
       payload = {
+        id: editID.value,
         dataCenterID: selectedDataCenterID.value,
         serverRoomName: ServerRoomName.value,
-        rackCapacity: parseInt(ServerRoomRackCapacity.value, 10),
-        startupDate: new Date().toISOString()
+        rackCapacity: ServerRoomRackCapacity.value
       };
       break;
   }
-  console.log(payload);
-  if (payload) {
+
+  if (isEditMode.value) {
+    // Assuming you have a method for updating data in your store
+    dataStore.updateData(activeType.value, payload)
+      .then(() => {
+        closeDialog();
+        resetFields();
+        isEditMode.value = false;  // Reset edit mode
+      })
+      .catch(error => {
+        console.error('Save failed:', error);
+      });
+  } else {
     dataStore.createData(activeType.value, payload)
       .then(() => {
         closeDialog();
+        resetFields();
       })
       .catch(error => {
         console.error('Save failed:', error);
       });
   }
 }
+
+
 function editItemOldLegacy(item) {
   console.log('Edit item:', item);
 }
+
 function editItem(item) {
+  isEditMode.value = true; 
+  editID.value = item[idFieldMapping[activeType.value]];
+  console.log("EditId is: " + item.serverRoomID);
   switch (activeType.value) {
     case 'DataRack':
       DataRackName.value = item.datarackName;
-      selectedServerRoomID.value = item.serverRoomID;
+      selectedServerRoomID.value = item.serverRoomName;
       DataRackPlacement.value = item.rackPlacement;
       HeightOfDataRack.value = item.totalUnits;
       availableDataRackUnits.value = item.availableUnits;
-      DatarackStatus.value = item.status;
+      DatarackStatus.value = item.rackStatus;
       break;
     case 'Company':
       CompanyName.value = item.name;
@@ -386,9 +427,9 @@ function editItem(item) {
       ServerRoomRackCapacity.value = item.rackCapacity;
       break;
   }
-  toggleDialog(); // Open the dialog with populated data
-}
 
+  toggleDialog(); 
+}
 
 function deleteItem(item) {
   const confirmDelete = confirm(`Are you sure you want to delete this ${activeType.value}? This cannot be undone.`);
@@ -422,9 +463,6 @@ function deleteItem(item) {
       });
   }
 }
-
-
-
 
 function viewDetails(item) {
   console.log('View details for item:', item);
