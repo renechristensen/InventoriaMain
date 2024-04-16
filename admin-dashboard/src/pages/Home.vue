@@ -88,6 +88,7 @@
                     label="Vælg virksomhed"
                     :items="companyItems"
                     item-title="companyName"
+                    item-value="companyID"
                     v-model="selectedCompanyID"
                     outlined
                   ></v-select>
@@ -300,10 +301,10 @@ function saveData() {
 
     case 'DataCenter':
       payload = {
-        Name: DataCenterName.value,
-        Address: DataCenterAddresse.value,
-        Description: DataCenterBeskrivelse.value,
-        CompanyID: selectedCompanyID.value
+        name: DataCenterName.value,
+        address: DataCenterAddresse.value,
+        description: DataCenterBeskrivelse.value,
+        companyID: selectedCompanyID.value
       };
       break;
 
