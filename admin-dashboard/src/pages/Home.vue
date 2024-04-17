@@ -12,35 +12,34 @@
             <v-btn @click="setActiveDataType('ServerRoom')">Serverrum</v-btn>
             <v-btn color="primary" @click="toggleDialog">Opret {{ activeTypeLabel }}</v-btn>
         </div>
-        /*
-          <div>
-  {{ dataStore.data[activeType] }}
-</div>*/
+
+        <div>
+          {{ dataStore.data[activeType] }}
+        </div>
 
           <!-- Searchable Data Table -->
           <v-data-table :headers="headers[activeType]" :items="dataStore.data[activeType]" class="elevation-1">
-  <template #item="{ item }">
-    <tr>
-      <!-- Dynamically create table cells for all headers except 'Actions' -->
-      <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
-        {{ item[header.key] }}
-      </td>
-      <!-- Action buttons column -->
-      <td>
-        <v-btn icon @click="editItem(item)">
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn icon @click="deleteItem(item)">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-        <v-btn icon v-if="activeType === 'DataRack'" @click="viewDetails(item)">
-  <v-icon>mdi-eye</v-icon>
-</v-btn>
-
-      </td>
-    </tr>
-  </template>
-</v-data-table>
+            <template #item="{ item }">
+              <tr>
+              <!-- Dynamically create table cells for all headers except 'Actions' -->
+                <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
+                  {{ item[header.key] }}
+                </td>
+                <!-- Action buttons column -->
+                <td>
+                  <v-btn icon @click="editItem(item)">
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn icon @click="deleteItem(item)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                  <v-btn icon v-if="activeType === 'DataRack'" @click="viewDetails(item)">
+                    <v-icon>mdi-eye</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
 
           <!-- Create DataRack -->
           <v-dialog v-model="dataStore.dialogIsActive" max-width="500px">
