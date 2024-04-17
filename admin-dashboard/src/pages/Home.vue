@@ -33,9 +33,10 @@
         <v-btn icon @click="deleteItem(item)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
-        <v-btn icon @click="viewDetails(item)">
-          <v-icon>mdi-eye</v-icon>
-        </v-btn>
+        <v-btn icon v-if="activeType === 'DataRack'" @click="viewDetails(item)">
+  <v-icon>mdi-eye</v-icon>
+</v-btn>
+
       </td>
     </tr>
   </template>
