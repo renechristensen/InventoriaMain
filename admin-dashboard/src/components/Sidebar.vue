@@ -55,9 +55,10 @@ const menuItems = [
 
 const handleNavigation = (route, title) => {
   if (title === 'Logout') {
-    authStore.logout(); // Call logout from auth store
+    authStore.logout(); 
+    router.push('/login');
   } else {
-    router.push({ name: route });
+    router.push(route);
   }
 };
 
