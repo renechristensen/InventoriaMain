@@ -145,10 +145,15 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import { ref, computed, watch, onMounted  } from 'vue';
 import Sidebar from '@/components/Sidebar';
 import { useDataStore } from '@/stores/data';
+import { useDataRackStore } from '@/stores/dataRackStore';
 
+
+const router = useRouter();
+const dataRackStore = useDataRackStore();
 const dataStore = useDataStore();
 const activeType = ref('DataRack');
 const search = ref('');
@@ -466,7 +471,9 @@ function deleteItem(item) {
 }
 
 function viewDetails(item) {
-  console.log('View details for item:', item);
+  console.log('View details for item:', item.dataRackID);
+  dataRackStore.setDataRackId(item.dataRackID);
+  router.push('/DataRackDetails');
 }
 </script>
 

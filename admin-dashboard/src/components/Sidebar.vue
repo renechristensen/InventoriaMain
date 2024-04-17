@@ -36,9 +36,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth'; // Using auth store for logout
+import { useAuthStore } from '@/stores/auth';
 
-const authStore = useAuthStore(); // Assuming authStore has logout logic
+const authStore = useAuthStore(); 
 const router = useRouter();
 
 const isExpanded = ref(true);
