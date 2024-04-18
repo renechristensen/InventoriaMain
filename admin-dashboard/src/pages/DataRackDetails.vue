@@ -34,10 +34,19 @@
           <v-row>
             <v-col cols="12">
               <v-data-table
-                :headers="dataUnitTableHeaders"
-                :items="dataStore.data['RackUnit']"
-                class="elevation-1"
-              ></v-data-table>
+  :headers="dataUnitTableHeaders"
+  :items="dataStore.data['RackUnit']"
+  class="elevation-1"
+>
+  <template v-slot:item="{ item }">
+    <tr :class="getRowClass(item)">
+      <td v-for="header in dataUnitTableHeaders" :key="header.key">
+        {{ item[header.key] }}
+      </td>
+    </tr>
+  </template>
+</v-data-table>
+
             </v-col>
           </v-row>
         </div>
@@ -112,6 +121,16 @@ const dataUnitTableHeaders = computed(() => [
   { title: 'type', key: 'equipmentType'},
   { title: 'model', key: 'equipmentModel'},
 ]);
+
+function getRowClass(item) {
+  if (item.displayName && item.equipmentName) {
+    return 'red-row'; 
+  } else if (item.displayName) {
+    return 'blue-row'; 
+  }
+  return 'green-row';
+}
+
 </script>
 
 <style scoped>
@@ -144,4 +163,15 @@ const dataUnitTableHeaders = computed(() => [
 .detail-content {
   padding-left: 12px;
 }
+
+.red-row {
+  background-color: #ffcccc;
+}
+.blue-row {
+  background-color: #ccccff;
+}
+.green-row {
+  background-color: #ccffcc;
+}
+
 </style>
