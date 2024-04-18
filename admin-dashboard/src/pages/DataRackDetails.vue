@@ -88,7 +88,7 @@ const headersMap = {
   'dataCenterName': 'Data Center',
   'serverRoomName': 'Server lokale',
   'datarackName': 'Navn',
-  'roles': 'Rolle'
+  'roles': 'RolleAdgang'
 };
 
 const tableHeaders = computed(() => [

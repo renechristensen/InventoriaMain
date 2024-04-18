@@ -44,4 +44,10 @@ Create datarack data
   "availableUnits": 42,
   "status": "Aktiv"
 }
-
+opret hurtig bruger
+{
+  "displayname": "Administrator",
+  "studieEmail": "admin@edu.sde.dk",
+  "password": "QHA49qxp?",
+  "companyID": 1
+}

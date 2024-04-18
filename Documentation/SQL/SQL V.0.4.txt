@@ -1,0 +1,233 @@
+/* Create Inventoria database and start using it */
+CREATE DATABASE IF NOT EXISTS Inventoria;
+USE Inventoria;
+
+/* Create database users */
+CREATE USER IF NOT EXISTS 'inventarioUser'@'localhost' IDENTIFIED BY 'ha32iixs_';
+GRANT ALL PRIVILEGES ON inventoria.* TO 'inventarioUser'@'localhost';
+FLUSH PRIVILEGES;
+
+
+/* Company table */
+CREATE TABLE IF NOT EXISTS Company (
+  CompanyID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Name VARCHAR(255) NOT NULL,
+  Description TEXT
+);
+
+/* DataCenter table */
+CREATE TABLE IF NOT EXISTS DataCenter (
+  DataCenterID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Name VARCHAR(255) NOT NULL,
+  Address VARCHAR(255) NOT NULL,
+  Description TEXT,
+  CompanyID INT,
+  FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+);
+
+/* ServerRoom table */
+CREATE TABLE IF NOT EXISTS ServerRoom (
+  ServerRoomID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataCenterID INT NOT NULL,
+  ServerRoomName VARCHAR(255) NOT NULL,
+  RackCapacity INT NOT NULL,
+  StartupDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (DataCenterID) REFERENCES DataCenter(DataCenterID)
+);
+
+/* DataRacks table */
+CREATE TABLE IF NOT EXISTS DataRack (
+  DataRackID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ServerRoomID INT NOT NULL,
+  RackPlacement TEXT NOT NULL,
+  TotalUnits INT NOT NULL,
+  AvailableUnits INT NOT NULL,
+  Status ENUM('Active', 'Inactive', 'Maintenance', 'Decommissioned') NOT NULL,
+  CreationDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (ServerRoomID) REFERENCES ServerRoom(ServerRoomID)
+);
+
+/* RackUnits table */
+CREATE TABLE IF NOT EXISTS RackUnit (
+  RackUnitID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataRackID INT NOT NULL,
+  UnitNumber INT NOT NULL,
+  FOREIGN KEY (DataRackID) REFERENCES DataRack(DataRackID)
+);
+
+/* Users table */
+CREATE TABLE IF NOT EXISTS User (
+  UserID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Displayname VARCHAR(255) NOT NULL,
+  PasswordHash VARBINARY(255) NOT NULL,
+  PasswordSalt VARBINARY(255) NOT NULL,
+  StudieEmail VARCHAR(255) NOT NULL,
+  CreationDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  LastLoginDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CompanyID INT,
+  FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+);
+
+/* Roles table */
+CREATE TABLE IF NOT EXISTS Role (
+  RoleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  RoleName VARCHAR(255) NOT NULL
+);
+
+/* UserRole junction table */
+CREATE TABLE IF NOT EXISTS UserRole (
+  UserRoleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  UserID INT NOT NULL,
+  RoleID INT NOT NULL,
+  FOREIGN KEY (UserID) REFERENCES User(UserID),
+  FOREIGN KEY (RoleID) REFERENCES Role(RoleID)
+);
+
+/* Reservations table */
+CREATE TABLE IF NOT EXISTS Reservation (
+  ReservationID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  UserID INT NOT NULL,
+  StartDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  EndDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Background TEXT NOT NULL,
+  FOREIGN KEY (UserID) REFERENCES User(UserID)
+);
+
+/* ReservedRackUnit table */
+CREATE TABLE IF NOT EXISTS ReservedRackUnit (
+  ReservedRackUnitID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ReservationID INT NOT NULL,
+  RackUnitID INT NOT NULL,
+  FOREIGN KEY (ReservationID) REFERENCES Reservation(ReservationID),
+  FOREIGN KEY (RackUnitID) REFERENCES RackUnit(RackUnitID)
+);
+
+/* Equipment table */
+CREATE TABLE IF NOT EXISTS Equipment (
+  EquipmentID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Name VARCHAR(255) NOT NULL,
+  Model VARCHAR(255) NOT NULL,
+  Type VARCHAR(255) NOT NULL
+);
+
+/* EquipmentRackUnits table */
+CREATE TABLE IF NOT EXISTS EquipmentRackUnit (
+  EquipmentRackUnitID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  EquipmentID INT NOT NULL,
+  RackUnitID INT NOT NULL,
+  FOREIGN KEY (EquipmentID) REFERENCES Equipment(EquipmentID),
+  FOREIGN KEY (RackUnitID) REFERENCES RackUnit(RackUnitID)
+);
+
+/* EnvironmentalReadings table */
+CREATE TABLE IF NOT EXISTS EnvironmentalReading (
+  EnvironmentalReadingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Temperature FLOAT NOT NULL,
+  Humidity FLOAT NOT NULL,
+  ReadingTimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+/* EnvironmentalSettings table */
+CREATE TABLE IF NOT EXISTS EnvironmentalSetting (
+  EnvironmentalSettingsID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ServerRoomID INT NOT NULL,
+  TemperatureUpperLimit FLOAT NOT NULL,
+  TemperatureLowerLimit FLOAT NOT NULL,
+  HumidityUpperLimit FLOAT NOT NULL,
+  HumidityLowerLimit FLOAT NOT NULL,
+  LatestChange TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (ServerRoomID) REFERENCES ServerRoom(ServerRoomID)
+);
+
+/* AlertTypes table */
+CREATE TABLE IF NOT EXISTS AlertType (
+  AlertTypeID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  TypeName VARCHAR(255) NOT NULL,
+  Description TEXT
+);
+
+/* Alerts table */
+CREATE TABLE IF NOT EXISTS Alert (
+  AlertID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  AlertTypeID INT NOT NULL,
+  ThresholdExceeded BOOL NOT NULL,
+  EnvironmentalReadingID INT NOT NULL,
+  AlertTimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Resolved BOOL NOT NULL,
+  FOREIGN KEY (AlertTypeID) REFERENCES AlertType(AlertTypeID),
+  FOREIGN KEY (EnvironmentalReadingID) REFERENCES EnvironmentalReading(EnvironmentalReadingID)
+);
+
+/* RackAccessPermissions table */
+CREATE TABLE IF NOT EXISTS RackAccessPermission (
+  RackAccessPermissionID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataRackID INT NOT NULL,
+  RoleID INT NOT NULL,
+  FOREIGN KEY (DataRackID) REFERENCES DataRack(DataRackID),
+  FOREIGN KEY (RoleID) REFERENCES Role(RoleID)
+);
+
+/* UserChangeLog table */
+CREATE TABLE IF NOT EXISTS UserChangeLog (
+  UserChangeLogID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  UserID INT NOT NULL,
+  ChangedByUserID INT NOT NULL,
+  ChangeType VARCHAR(255) NOT NULL,
+  ChangeTimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ChangeDescription TEXT,
+  FOREIGN KEY (UserID) REFERENCES User(UserID),
+  FOREIGN KEY (ChangedByUserID) REFERENCES User(UserID)
+);
+
+/* DataRacksChangeLog table */
+CREATE TABLE IF NOT EXISTS DataRacksChangeLog (
+  DataRacksChangeLogID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  DataRackID INT NOT NULL,
+  ChangedByUserID INT NOT NULL,
+  ChangeType VARCHAR(255) NOT NULL,
+  ChangeTimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ChangeDescription TEXT,
+  FOREIGN KEY (DataRackID) REFERENCES DataRack(DataRackID),
+  FOREIGN KEY (ChangedByUserID) REFERENCES User(UserID)
+);
+
+ALTER TABLE `inventoria`.`datarack` 
+ADD COLUMN `datarackschangelogdatarack datarackName` VARCHAR(255) NOT NULL AFTER `CreationDate`;
+
+ALTER TABLE `inventoria`.`datarack` 
+CHANGE COLUMN `Status` `Status` ENUM('Aktiv', 'Inaktiv', 'Vedligeholdelse', 'Lukket ned') NOT NULL ;
+ 
+
+INSERT INTO `inventoria`.`company`
+(`Name`,`Description`)
+VALUES
+('SyddanskErhversskole', 'En Skole');
+
+INSERT INTO `inventoria`.`datacenter`
+(`Name`,`Address`,`Description`,`CompanyID`)
+VALUES
+('DataCenter 1', 'Munkebjergvej', 'et datacenter for skolen', 1);
+
+INSERT INTO `inventoria`.`role`
+(`RoleName`)
+VALUES
+('Elev');
+
+INSERT INTO `inventoria`.`role`
+(`RoleName`)
+VALUES
+('Laerer');
+
+INSERT INTO `inventoria`.`role`
+(`RoleName`)
+VALUES
+('Admin');
+
+INSERT INTO `inventoria`.`role`
+(`RoleName`)
+VALUES
+('SOP');
+
+INSERT INTO `inventoria`.`serverroom` (`DataCenterID`, `ServerRoomName`, `RackCapacity`) 
+VALUES 
+('1', 'ITSKP Server_Rum', '9');
