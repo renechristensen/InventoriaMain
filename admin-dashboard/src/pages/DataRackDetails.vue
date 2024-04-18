@@ -14,7 +14,7 @@
           <v-row>
             <v-col cols="12">
               <div class="details-card">
-                <div v-for="(value, key) in dataDetails" :key="key" class="detail-item">
+                <div v-for="(value, key) in dataRackDetails" :key="key" class="detail-item">
                   <div class="detail-header">{{ headersMap[key] }}</div>
                   <div class="detail-content">
                     <!-- Conditional rendering for roles and date -->
@@ -25,13 +25,17 @@
               </div>
             </v-col>
           </v-row>
+            
+        <div>
+          <!--{{ dataStore.data.rackUnitByDataRackID }}-->
+        </div>
 
           <!-- Data table for data display -->
           <v-row>
             <v-col cols="12">
               <v-data-table
-                :headers="tableHeaders"
-                :items="[dataDetails]"
+                :headers="dataUnitTableHeaders"
+                :items="dataStore.data['RackUnit']"
                 class="elevation-1"
               ></v-data-table>
             </v-col>
@@ -54,29 +58,35 @@ const dataRackStore = useDataRackStore();
 const dataStore = useDataStore();
 const activeType = ref('DataRack');
 
+// on startup, check if they are are trying to navigate here without having set a currentDataRackID, without first going through
+// the home page and selecting a datarack
 onMounted(async () => {
   if (!dataRackStore.currentDataRackId) {
-    router.push('/home'); // Ensure you define the 'home' route in your router
+    router.push('/home');
   } else {
     await dataStore.fetchDataById(activeType.value, dataRackStore.currentDataRackId);
+    // getting all the rackunits from my database 
+    await dataStore.fetchDataById("RackUnit", dataRackStore.currentDataRackId);
   }
 });
 
-const dataDetails = computed(() => {
-  return dataStore.data.currentData || {};
+// fixing some issues with how data is displayed
+const dataRackDetails = computed(() => {
+  return dataStore.data.dataRackByIDData || {};
 });
 
 const formattedRoles = computed(() => {
-  return dataDetails.value.roles ? dataDetails.value.roles.join(", ") : "";
+  return dataRackDetails.value.roles ? dataRackDetails.value.roles.join(", ") : "";
 });
 
 const formattedDate = computed(() => {
-  if (dataDetails.value.rackStartupDate) {
-    return new Date(dataDetails.value.rackStartupDate).toLocaleDateString('en-GB');
+  if (dataRackDetails.value.rackStartupDate) {
+    return new Date(dataRackDetails.value.rackStartupDate).toLocaleDateString('en-GB');
   }
   return "";
 });
 
+// this is for the card's headers
 const headersMap = {
   'rackPlacement': 'Placering',
   'dataRackID' : 'DatabaseID',
@@ -91,12 +101,16 @@ const headersMap = {
   'roles': 'RolleAdgang'
 };
 
-const tableHeaders = computed(() => [
-  { title: 'Placering', key: 'rackPlacement' },
-  { title: 'Virksomhed', key: 'companyName' },
-  { title: 'Data Center', key: 'dataCenterName' },
-  { title: 'Server lokale', key: 'serverRoomName' },
-  { title: 'Navn', key: 'datarackName' },
+// dataunit table headers for the 
+const dataUnitTableHeaders = computed(() => [
+  { title: 'U', key: "unitNumber"},
+  { title: 'Res', key: "displayName"},
+  { title: 'Studie email', key: "studieEmail"},
+  { title: 'Start', key: 'startDate'},
+  { title: 'Slut', key: 'endDate'},
+  { title: 'Udstyr titel', key: 'equipmentName'}, 
+  { title: 'type', key: 'equipmentType'},
+  { title: 'model', key: 'equipmentModel'},
 ]);
 </script>
 

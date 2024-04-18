@@ -7,7 +7,8 @@ export const useDataStore = defineStore('data', {
   state: () => ({
     activeType: 'DataRack',
     data: {
-      currentData: {}
+      dataRackByIDData: {},
+      rackUnitByDataRackID: {}
     },
     nameLists: {},
     dialogIsActive: false,
@@ -25,10 +26,12 @@ export const useDataStore = defineStore('data', {
       const url = `${appStore.apiUrl}/api/${type}/${id}`;
       try {
         const response = await axios.get(url);
-        this.data.currentData = response.data; // Store the fetched data
+        if(type === "DataRack") this.data.dataRackByIDData = response.data;
+        //if(type === "RackUnit") this.data.rackUnitByDataRackID = response.data;
+        if(type === "RackUnit") this.data[type] = response.data;
+        ;
       } catch (error) {
         console.error('Fetch by ID failed:', error);
-        this.data.currentData = {};
       }
     },
     async fetchData(type) {
