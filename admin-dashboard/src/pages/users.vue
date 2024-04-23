@@ -99,7 +99,6 @@ const roleName = ref('');
 const itemID = ref('');
 const selectedCompanyID = ref(null);
 
-
 const activeTypeLabel = computed(() => activeType.value === 'User' ? 'Brugere' : 'Roller');
 
 const headers = computed(() => ({
@@ -150,14 +149,19 @@ function toggleDialog() {
   }
 }
 
+const idFieldMapping = {
+  User: 'userID',
+  Role: 'roleID'
+};
 function editItem(item) {
   isEditMode.value = true;
-  editID.value = item.id;
+  editID.value = item[idFieldMapping[activeType.value]];
+
   if (activeType.value === 'User') {
     displayName.value = item.displayname;
     studieEmail.value = item.studieEmail;
-    companyID.value = item.companyID; // Assuming company ID is provided correctly
-    password.value = ''; // Reset password field
+    selectedCompanyID.value = item.companyID;
+    password.value = ''; 
   } else if (activeType.value === 'Role') {
     roleName.value = item.roleName;
   }
@@ -171,9 +175,12 @@ function saveData() {
       id: isEditMode.value ? editID.value : undefined,
       displayname: displayName.value,
       studieEmail: studieEmail.value,
-      password: password.value,
       companyID: selectedCompanyID.value
     };
+    // Include password only if it has been set
+    if (password.value) {
+      payload.password = password.value;
+    }
   } else if (activeType.value === 'Role') {
     payload = {
       id: isEditMode.value ? editID.value : undefined,
@@ -181,6 +188,7 @@ function saveData() {
     };
   }
 
+  console.log(payload);
   const action = isEditMode.value ? 'updateData' : 'createData';
   dataStore[action](activeType.value, payload).then(() => {
     toggleDialog();
@@ -191,7 +199,7 @@ function saveData() {
   });
 }
 
-function deleteItem(item) {
+function deleteItem(item) { 
   itemID.value = item.id; 
   console.log(item);
   if(activeType.value === "Role") {itemID.value = item.roleID; }
@@ -211,7 +219,7 @@ function resetFields() {
   displayName.value = '';
   studieEmail.value = '';
   password.value = '';
-  companyID.value = null;
+  selectedCompanyID.value = null;
   roleName.value = '';
   isEditMode.value = false;
 }
