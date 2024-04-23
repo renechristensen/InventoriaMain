@@ -5,12 +5,11 @@ import { useAppStore } from './app';
 
 export const useDataStore = defineStore('data', {
   state: () => ({
-    activeType: 'DataRack',
+    activeType: 'DataRack',  
     data: {
       dataRackByIDData: {},
       rackUnitByDataRackID: {}
-    },
-    nameLists: {},
+        },
     dialogIsActive: false,
   }),
   actions: {
@@ -23,53 +22,74 @@ export const useDataStore = defineStore('data', {
     },
     async fetchDataById(type, id) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}/${id}`;
+      let url = `${appStore.apiUrl}/api/${type}/${id}`;
+      if (type === "User") {
+        url = `${appStore.apiUrl}/api/User/GetUser/${id}`;
+      }
       try {
         const response = await axios.get(url);
-        if (type === "DataRack") this.data.dataRackByIDData = response.data;
-        if (type === "RackUnit") this.data[type] = response.data;
+        if (type === "DataRack") {
+          this.data.dataRackByIDData = response.data;
+        } else {
+          this.data[type] = response.data;
+        }
       } catch (error) {
-        console.error('Fetch by ID failed:', error);
+        console.error(`Fetch by ID for ${type} failed:`, error);
       }
     },
     async fetchData(type) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}`;
+      let url = `${appStore.apiUrl}/api/${type}`;
+      if (type === "User") {
+        url = `${appStore.apiUrl}/api/User/GetAllUsers`;
+      }
+      else if(type === "Role"){
+        url = `${appStore.apiUrl}/api/Role/GetAllRoles`;
+      }
       try {
         const response = await axios.get(url);
         this.data[type] = response.data;
       } catch (error) {
-        console.error('Fetch failed:', error);
+        console.error(`Fetch for ${type} failed:`, error);
       }
     },
     async createData(type, payload) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}`;
+      let url = `${appStore.apiUrl}/api/${type}`;
+      if (type === "User") {
+        url = `${appStore.apiUrl}/api/User/CreateUser`;
+      }
       try {
         const response = await axios.post(url, payload);
         this.fetchData(type);
       } catch (error) {
-        console.error('Create failed:', error);
+        console.error(`Create for ${type} failed:`, error);
       }
     },
     async updateData(type, payload) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}/${payload.id}`;
+      let url = `${appStore.apiUrl}/api/${type}/${payload.id}`;
+      if (type === "User") {
+        url = `${appStore.apiUrl}/api/User/UpdateUser/${payload.id}`;
+      }
       try {
         const response = await axios.put(url, payload);
         this.fetchData(type);
       } catch (error) {
-        console.error('Update failed:', error);
+        console.error(`Update for ${type} failed:`, error);
       }
     },
     async deleteData(type, id) {
       const appStore = useAppStore();
-      const url = `${appStore.apiUrl}/api/${type}/${id}`;
+      let url = `${appStore.apiUrl}/api/${type}/${id}`;
+      if (type === "User") {
+        url = `${appStore.apiUrl}/api/User/DeleteUser/${id}`;
+      }
       try {
         await axios.delete(url);
         this.fetchData(type);
       } catch (error) {
-        console.error('Delete failed:', error);
+        console.error(`Delete for ${type} failed:`, error);
       }
     },
     async deleteReservationsByRackUnit(rackUnitId, startDate, endDate) {
@@ -78,7 +98,9 @@ export const useDataStore = defineStore('data', {
       try {
         const response = await axios.delete(url);
         console.log('Delete successful', response.data);
-        this.fetchData('RackUnit'); // Optionally refresh RackUnit data
+        if (this.activeType === 'RackUnit') {
+          this.fetchData('RackUnit');
+        }
       } catch (error) {
         console.error('Delete failed:', error);
         throw new Error('Deletion failed due to API error.');
