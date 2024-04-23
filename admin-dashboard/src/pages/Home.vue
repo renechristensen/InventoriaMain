@@ -21,11 +21,10 @@
           <v-data-table :headers="headers[activeType]" :items="dataStore.data[activeType]" class="elevation-1">
             <template #item="{ item }">
               <tr>
-              <!-- Dynamically create table cells for all headers except 'Actions' -->
                 <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
-                  {{ item[header.key] }}
+                  <!-- Use the formatDate method for the date field -->
+                  {{ header.key === 'rackStartupDate' ? formatDate(item[header.key]) : item[header.key] }}
                 </td>
-                <!-- Action buttons column -->
                 <td>
                   <v-btn icon @click="editItem(item)">
                     <v-icon>mdi-pencil</v-icon>
@@ -332,6 +331,12 @@ function resetFields() {
   DataCenterName.value = '';
   DataCenterAddresse.value = '';
   DataCenterBeskrivelse.value = '';
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' }) + 
+         ' ' + date.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
 }
 
 function saveData() {
