@@ -34,6 +34,47 @@
               </tr>
             </template>
           </v-data-table>
+
+          <!-- Dialogs for Creating and Editing Users and Roles -->
+          <v-dialog v-model="dialogIsActive" max-width="500px">
+            <!-- User Dialog -->
+            <template v-if="activeType === 'User'">
+              <v-card>
+                <v-card-title>{{ isEditMode ? 'Rediger Bruger' : 'Opret Bruger' }}</v-card-title>
+                <v-card-text>
+                  <v-text-field label="Display Navn" v-model="displayName" required outlined></v-text-field>
+                  <v-text-field label="Arbejds Email" v-model="studieEmail" required outlined :rules="emailRules"></v-text-field>
+                  <v-text-field label="Password" v-model="password" type="password" required outlined :rules="passwordRules"></v-text-field>
+                  <v-select 
+                    label="Virksomhed" 
+                    v-model="selectedCompanyID"
+                    :items="companyItems"
+                    item-title="companyName"
+                    item-value="companyID"
+                    required outlined>
+                  </v-select>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click="toggleDialog">Annuller</v-btn>
+                  <v-btn color="primary" @click="saveData">Gem</v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+
+            <!-- Role Dialog -->
+            <template v-if="activeType === 'Role'">
+              <v-card>
+                <v-card-title>{{ isEditMode ? 'Rediger Rolle' : 'Opret Rolle' }}</v-card-title>
+                <v-card-text>
+                  <v-text-field label="Rolle Titel" v-model="roleName" required outlined></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click="toggleDialog">Annuller</v-btn>
+                  <v-btn color="primary" @click="saveData">Gem</v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-dialog>
         </div>
       </v-col>
     </v-row>
@@ -41,16 +82,25 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import Sidebar from '@/components/Sidebar';
 import { useDataStore } from '@/stores/data';
 
 const dataStore = useDataStore();
 const activeType = ref('User');
+const dialogIsActive = ref(false);
+const isEditMode = ref(false);
+const editID = ref(null);
+const displayName = ref('');
+const studieEmail = ref('');
+const password = ref('');
+const companyID = ref(null);
+const roleName = ref('');
+const itemID = ref('');
+const selectedCompanyID = ref(null);
 
-const activeTypeLabel = computed(() => {
-  return activeType.value === 'User' ? 'User' : 'Role';
-});
+
+const activeTypeLabel = computed(() => activeType.value === 'User' ? 'Brugere' : 'Roller');
 
 const headers = computed(() => ({
   User: [
@@ -67,24 +117,103 @@ const headers = computed(() => ({
   ]
 }));
 
-function toggleDialog() {
-  dataStore.dialogIsActive = !dataStore.dialogIsActive;
-}
+const companyItems = computed(() => {
+  return dataStore.data['Company']?.map(company => ({
+    companyName: company.name,
+    companyID: company.companyID
+  })) || [];
+});
 
-function editItem(item) {
-  // Implement editing logic based on item details
-}
+onMounted(() => {
+  setActiveDataType('Company');
+  setActiveDataType('User');
+});
 
-function deleteItem(item) {
-  if (confirm(`Are you sure you want to delete this ${activeType.value}? This cannot be undone.`)) {
-    dataStore.deleteData(activeType.value, item.id);
-  }
-}
+const emailRules = [v => !!v || 'E-mail is required', v => /.+@.+\..+/.test(v) || 'E-mail must be valid'];
+const passwordRules = [
+  v => !!v || 'Password is required',
+  v => v.length >= 8 || 'Password must be at least 8 characters',
+  v => /[A-Za-z]/.test(v) && /\d/.test(v) && /[\s\S]*[\W_]+[\s\S]*/.test(v) || 'Password must include letters, numbers, and special characters'
+];
 
 function setActiveDataType(type) {
   activeType.value = type;
   dataStore.setActiveType(type);
   dataStore.fetchData(type);
+  resetFields();
+}
+
+function toggleDialog() {
+  dialogIsActive.value = !dialogIsActive.value;
+  if (!dialogIsActive.value) {
+    resetFields();
+  }
+}
+
+function editItem(item) {
+  isEditMode.value = true;
+  editID.value = item.id;
+  if (activeType.value === 'User') {
+    displayName.value = item.displayname;
+    studieEmail.value = item.studieEmail;
+    companyID.value = item.companyID; // Assuming company ID is provided correctly
+    password.value = ''; // Reset password field
+  } else if (activeType.value === 'Role') {
+    roleName.value = item.roleName;
+  }
+  toggleDialog();
+}
+
+function saveData() {
+  let payload = {};
+  if (activeType.value === 'User') {
+    payload = {
+      id: isEditMode.value ? editID.value : undefined,
+      displayname: displayName.value,
+      studieEmail: studieEmail.value,
+      password: password.value,
+      companyID: selectedCompanyID.value
+    };
+  } else if (activeType.value === 'Role') {
+    payload = {
+      id: isEditMode.value ? editID.value : undefined,
+      roleName: roleName.value
+    };
+  }
+
+  const action = isEditMode.value ? 'updateData' : 'createData';
+  dataStore[action](activeType.value, payload).then(() => {
+    toggleDialog();
+    isEditMode.value = false;
+    resetFields();
+  }).catch(error => {
+    console.error(`${isEditMode.value ? 'Update' : 'Create'} failed:`, error);
+  });
+}
+
+function deleteItem(item) {
+  itemID.value = item.id; 
+  console.log(item);
+  if(activeType.value === "Role") {itemID.value = item.roleID; }
+  if(activeType.value === "User") {itemID.value = item.userID; }
+
+  if (confirm(`Are you sure you want to delete this ${activeType.value}? This cannot be undone.`)) {
+    dataStore.deleteData(activeType.value, itemID.value).then(() => {
+      console.log('Item deleted successfully');
+    }).catch(error => {
+      console.error('Error deleting item:', error);
+    });
+  }
+}
+
+function resetFields() {
+  editID.value = null;
+  displayName.value = '';
+  studieEmail.value = '';
+  password.value = '';
+  companyID.value = null;
+  roleName.value = '';
+  isEditMode.value = false;
 }
 </script>
 
