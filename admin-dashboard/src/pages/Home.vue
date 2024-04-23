@@ -56,8 +56,8 @@
                     outlined
                   ></v-select>
                   <v-text-field label="Placeringsbeskrivelse" v-model="DataRackPlacement" outlined></v-text-field>
-                  <v-text-field label="Højde på rack(U)" v-model="HeightOfDataRack" outlined type="number"></v-text-field>
-                  <v-text-field label="Afsatte enheder(U)" v-model="availableDataRackUnits" outlined type="number"></v-text-field>
+                  <v-text-field label="Højde på rack(Unit)" v-model="HeightOfDataRack" outlined type="number"></v-text-field>
+                  <v-text-field label="Afsatte enheder(Unit)" v-model="availableDataRackUnits" outlined type="number"></v-text-field>
                   <v-select
                     label="Status"
                     :items="statusItems"
@@ -234,7 +234,7 @@ const headers = computed(() => ({
     //{ title: 'ID', key: 'dataRackID' },
     { title: 'Opstart', key: 'rackStartupDate' },
     { title: 'Status', key: 'rackStatus' },
-    { title: 'Højde(U)', key: 'totalUnits' },
+    { title: 'Højde(Unit)', key: 'totalUnits' },
     { title: 'Ledige', key: 'availableUnits' },
     { title: 'Actions', key: 'actions', sortable: false }
   ],
@@ -335,8 +335,7 @@ function resetFields() {
 
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' }) + 
-         ' ' + date.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function saveData() {

@@ -26,10 +26,8 @@ export const useDataStore = defineStore('data', {
       const url = `${appStore.apiUrl}/api/${type}/${id}`;
       try {
         const response = await axios.get(url);
-        if(type === "DataRack") this.data.dataRackByIDData = response.data;
-        //if(type === "RackUnit") this.data.rackUnitByDataRackID = response.data;
-        if(type === "RackUnit") this.data[type] = response.data;
-        ;
+        if (type === "DataRack") this.data.dataRackByIDData = response.data;
+        if (type === "RackUnit") this.data[type] = response.data;
       } catch (error) {
         console.error('Fetch by ID failed:', error);
       }
@@ -49,7 +47,6 @@ export const useDataStore = defineStore('data', {
       const url = `${appStore.apiUrl}/api/${type}`;
       try {
         const response = await axios.post(url, payload);
-        console.log('Create successful:', response.data);
         this.fetchData(type);
       } catch (error) {
         console.error('Create failed:', error);
@@ -60,7 +57,6 @@ export const useDataStore = defineStore('data', {
       const url = `${appStore.apiUrl}/api/${type}/${payload.id}`;
       try {
         const response = await axios.put(url, payload);
-        console.log('Update successful:', response.data);
         this.fetchData(type);
       } catch (error) {
         console.error('Update failed:', error);
@@ -71,10 +67,21 @@ export const useDataStore = defineStore('data', {
       const url = `${appStore.apiUrl}/api/${type}/${id}`;
       try {
         await axios.delete(url);
-        console.log('Delete successful');
         this.fetchData(type);
       } catch (error) {
         console.error('Delete failed:', error);
+      }
+    },
+    async deleteReservationsByRackUnit(rackUnitId, startDate, endDate) {
+      const appStore = useAppStore();
+      const url = `${appStore.apiUrl}/api/Reservation/by-rack-unit?rackUnitId=${rackUnitId}&startDate=${startDate}&endDate=${endDate}`;
+      try {
+        const response = await axios.delete(url);
+        console.log('Delete successful', response.data);
+        this.fetchData('RackUnit'); // Optionally refresh RackUnit data
+      } catch (error) {
+        console.error('Delete failed:', error);
+        throw new Error('Deletion failed due to API error.');
       }
     }
   }

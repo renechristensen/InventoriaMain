@@ -27,7 +27,7 @@
           </v-row>
             
         <div>
-          <!--{{ dataStore.data.rackUnitByDataRackID }}-->
+          {{ dataStore.data['RackUnit'] }}
         </div>
 
           <!-- Data table for data display -->
@@ -43,10 +43,19 @@
       <td v-for="header in dataUnitTableHeaders" :key="header.key">
         {{ item[header.key] }}
       </td>
+      <!-- Conditional rendering of the Delete button -->
+      <td v-if="item.startDate && item.endDate">
+        <v-btn 
+          icon 
+          color="red"
+          @click="deleteReservation(item.rackUnitID, item.startDate, item.endDate)"
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </td>
     </tr>
   </template>
 </v-data-table>
-
             </v-col>
           </v-row>
         </div>
@@ -101,8 +110,8 @@ const headersMap = {
   'dataRackID' : 'DatabaseID',
   'rackStartupDate': 'Opstart',
   'rackStatus' : 'Status',
-  'totalUnits' : 'Enheder(U)',
-  'availableUnits' : 'Ledige Enheder(U)',
+  'totalUnits' : 'Enheder(Unit)',
+  'availableUnits' : 'Ledige Enheder(Unit)',
   'companyName': 'Virksomhed',
   'dataCenterName': 'Data Center',
   'serverRoomName': 'Server lokale',
@@ -112,7 +121,7 @@ const headersMap = {
 
 // dataunit table headers for the 
 const dataUnitTableHeaders = computed(() => [
-  { title: 'U', key: "unitNumber"},
+  { title: 'Unit', key: "unitNumber"},
   { title: 'Res', key: "displayName"},
   { title: 'Studie email', key: "studieEmail"},
   { title: 'Start', key: 'startDate'},
@@ -130,6 +139,24 @@ function getRowClass(item) {
   }
   return 'green-row';
 }
+
+
+function deleteReservation(rackUnitID, startDate, endDate) {
+  const confirmed = window.confirm(`Are you sure you want to delete the reservation for Rack Unit ID ${rackUnitID} from ${startDate} to ${endDate}?`);
+  if (confirmed) {
+    dataStore.deleteReservationsByRackUnit(rackUnitID, startDate, endDate)
+      .then(() => {
+        alert('Reservation deleted successfully.');
+        // Optionally fetch data again if needed
+        dataStore.fetchData('RackUnit');
+      })
+      .catch(error => {
+        console.error('Failed to delete reservation:', error);
+        alert('Failed to delete the reservation.');
+      });
+  }
+}
+
 
 </script>
 
