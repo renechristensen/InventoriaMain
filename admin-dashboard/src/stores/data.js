@@ -105,6 +105,20 @@ export const useDataStore = defineStore('data', {
         console.error('Delete failed:', error);
         throw new Error('Deletion failed due to API error.');
       }
+    },
+    async assignUserRole(payload) {
+      console.log("payload:" + payload);
+      const appStore = useAppStore();
+      const url = `${appStore.apiUrl}/api/UserRole/Assign`;
+      try {
+        console.log("payload:" + payload +" url: " + url);
+        const response = await axios.post(url, payload);
+        console.log('Role assigned successfully', response.data);
+        this.fetchData('User');  // Optionally refresh user data
+      } catch (error) {
+        console.error('Error assigning role:', error);
+        throw new Error('Role assignment failed due to API error.');
+      }
     }
   }
 });

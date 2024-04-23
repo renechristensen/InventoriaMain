@@ -30,6 +30,9 @@
                   <v-btn icon @click="deleteItem(item)">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
+                  <v-btn icon v-if="activeType === 'User'" @click="openAssignRoleDialog(item)">
+                    <v-icon>mdi-account-check-outline</v-icon>
+                  </v-btn>
                 </td>
               </tr>
             </template>
@@ -75,6 +78,28 @@
               </v-card>
             </template>
           </v-dialog>
+
+          <!-- Role Assignment Dialog -->
+          <v-dialog v-model="roleDialogActive" max-width="500px">
+            <v-card>
+              <v-card-title>Assign Role</v-card-title>
+              <v-card-text>
+                <v-select 
+                  label="Select Role" 
+                  v-model="selectedRole"
+                  :items="roleItems"
+                  item-title="roleName"
+                  item-key="roleID"
+                  return-object
+                  outlined>
+                </v-select>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="primary" @click="assignRole">Giv Rolle</v-btn>
+                <v-btn color="primary" @click="closeRoleDialog">Annuller</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </div>
       </v-col>
     </v-row>
@@ -98,6 +123,8 @@ const companyID = ref(null);
 const roleName = ref('');
 const itemID = ref('');
 const selectedCompanyID = ref(null);
+const roleDialogActive = ref(false);
+const selectedRole = ref(null);
 
 const activeTypeLabel = computed(() => activeType.value === 'User' ? 'Brugere' : 'Roller');
 
@@ -123,7 +150,15 @@ const companyItems = computed(() => {
   })) || [];
 });
 
+const roleItems = computed(() => {
+  return dataStore.data['Role']?.map(role => ({
+    roleName: role.roleName,
+    roleID: role.roleID
+  })) || [];
+});
+
 onMounted(() => {
+  setActiveDataType('Role');
   setActiveDataType('Company');
   setActiveDataType('User');
 });
@@ -134,6 +169,32 @@ const passwordRules = [
   v => v.length >= 8 || 'Password must be at least 8 characters',
   v => /[A-Za-z]/.test(v) && /\d/.test(v) && /[\s\S]*[\W_]+[\s\S]*/.test(v) || 'Password must include letters, numbers, and special characters'
 ];
+
+function openAssignRoleDialog(item) {
+  console.log(item);
+  itemID.value = item.userID;
+  roleDialogActive.value = true;
+}
+
+function closeRoleDialog() {
+  roleDialogActive.value = false;
+}
+
+function assignRole() {
+  console.log("itemID.value =" + itemID.value);
+  console.log(selectedRole.value.roleID);
+  const payload = {
+    userId: itemID.value,
+    roleId: selectedRole.value.roleID
+  };
+  // Assuming `assignUserRole` is an action in your Vuex store
+  dataStore.assignUserRole(payload).then(() => {
+    console.log('Role assigned successfully');
+    closeRoleDialog();
+  }).catch(error => {
+    console.error('Error assigning role:', error);
+  });
+}
 
 function setActiveDataType(type) {
   activeType.value = type;
@@ -177,8 +238,8 @@ function saveData() {
       studieEmail: studieEmail.value,
       companyID: selectedCompanyID.value
     };
-    // Include password only if it has been set
-    if (password.value) {
+        // Include password only if it has been set
+    if (password.value) { 
       payload.password = password.value;
     }
   } else if (activeType.value === 'Role') {
@@ -187,7 +248,7 @@ function saveData() {
       roleName: roleName.value
     };
   }
-
+  
   console.log(payload);
   const action = isEditMode.value ? 'updateData' : 'createData';
   dataStore[action](activeType.value, payload).then(() => {
@@ -199,8 +260,8 @@ function saveData() {
   });
 }
 
-function deleteItem(item) { 
-  itemID.value = item.id; 
+function deleteItem(item) {
+  itemID.value = item.id;
   console.log(item);
   if(activeType.value === "Role") {itemID.value = item.roleID; }
   if(activeType.value === "User") {itemID.value = item.userID; }
