@@ -6,13 +6,13 @@
         <div class="home-content">
           <!-- Action Buttons -->
           <div class="button-group">
-            <v-btn @click="setActiveDataType('EnvironmentalReading')">Environmental Readings</v-btn>
-            <v-btn @click="setActiveDataType('EnvironmentalSetting')">Environmental Settings</v-btn>
-            <v-btn color="primary" @click="toggleDialog" v-if="activeType === 'EnvironmentalSetting'">Create {{ activeTypeLabel }}</v-btn>          </div>
+            <v-btn @click="setActiveDataType('EnvironmentalReading')">Miljø målinger</v-btn>
+            <v-btn @click="setActiveDataType('EnvironmentalSetting')">Miljø advarsels indstillinger</v-btn>
+            <v-btn color="primary" @click="toggleDialog" v-if="activeType === 'EnvironmentalSetting'">Opret {{ activeTypeLabel }}</v-btn>          </div>
 
           <!-- Display Data -->
           <div>
-            {{ dataStore.data[activeType] }}
+            <!--{{ dataStore.data[activeType] }}-->
           </div>
 
           <!-- Searchable Data Table -->
@@ -20,7 +20,7 @@
             <template #item="{ item }">
               <tr>
                 <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
-                  {{ item[header.key] }}
+                  {{ header.key === 'readingTimestamp' ? formatDate(item[header.key]) : item[header.key] }}
                 </td>
                 <td>
                   <template v-if="activeType === 'EnvironmentalSetting'">
@@ -112,7 +112,7 @@ const itemID = ref('');
 
 // Computed properties for labels and headers
 const activeTypeLabel = computed(() => {
-  return activeType.value === 'EnvironmentalReading' ? 'Environmental Readings' : 'Environmental Settings';
+  return activeType.value === 'EnvironmentalReading' ? 'Miljø Målinger' : 'Miljø advarsels indstillinger';
 });
 
 const headers = computed(() => ({
@@ -159,6 +159,10 @@ function toggleDialog() {
   }
 }
 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 function resetFields() {
   editID.value = null;
   temperature.value = '';
@@ -228,6 +232,7 @@ function saveData() {
     console.error(`${isEditMode.value ? 'Update' : 'Create'} failed:`, error);
   });
 }
+
 
 function deleteItem(item) {
   itemID.value = item.id;
