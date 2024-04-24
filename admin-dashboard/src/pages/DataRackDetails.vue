@@ -26,13 +26,42 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- New Dialog for Editing Access Permissions -->
+    <v-dialog v-model="accessPermissionsDialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Edit Access Permissions</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-select
+                  v-model="selectedRoleId"
+                  :items="roleItems"
+                  item-title="roleName"
+                  item-key="roleID"
+                  label="Select Role"
+                  :rules="[v => !!v || 'A role is required']"
+                ></v-select>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="submitAccessPermissions">Save</v-btn>
+          <v-btn color="red darken-1" text @click="closeAccessPermissionsDialog">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-row>
       <Sidebar />
       <v-col cols="12">
         <div class="home-content">
           <!-- Action Buttons -->
           <div class="button-group">
-            <v-btn @click="openEditDialog">Rediger adgangsrettigheder</v-btn>
+            <v-btn @click="openAccessPermissionsDialog">Rediger adgangsrettigheder</v-btn>
             <v-btn @click="openEditDialog">Rediger</v-btn>
           </div>
 
@@ -104,6 +133,8 @@ const router = useRouter();
 const dataRackStore = useDataRackStore();
 const dataStore = useDataStore();
 
+const accessPermissionsDialog = ref(false);
+const selectedRoleId = ref(null);
 // Dialog state and editing data setup
 const editDialog = ref(false);
 const editData = ref({
@@ -146,6 +177,25 @@ async function submitEditData() {
     alert('Failed to update Data Rack');
   }
 }
+function openAccessPermissionsDialog() {
+  if (dataRackStore.currentDataRackId) {
+    accessPermissionsDialog.value = true;
+    // Optionally load roles here if not preloaded
+  } else {
+    console.error("No Data Rack ID found.");
+  }
+}
+
+function closeAccessPermissionsDialog() {
+  accessPermissionsDialog.value = false;
+}
+
+const roleItems = computed(() => {
+  return dataStore.data['Role']?.map(role => ({
+    roleName: role.roleName,
+    roleID: role.roleID
+  })) || [];
+});
 
 // Ensure the needed data is fetched on component mount
 onMounted(async () => {
@@ -154,8 +204,10 @@ onMounted(async () => {
   } else {
     await dataStore.fetchDataById('DataRack', dataRackStore.currentDataRackId);
     await dataStore.fetchDataById('RackUnit', dataRackStore.currentDataRackId);
+    dataStore.setActiveType('Role');
   }
 });
+
 
 // Computed properties for displaying data
 const dataRackDetails = computed(() => dataStore.data.dataRackByIDData || {});
