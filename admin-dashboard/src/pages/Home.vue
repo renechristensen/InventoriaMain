@@ -14,7 +14,7 @@
         </div>
 
         <div>
-          {{ dataStore.data[activeType] }}
+          <!--{{ dataStore.data[activeType] }}-->
         </div>
 
           <!-- Searchable Data Table -->
@@ -23,7 +23,7 @@
               <tr>
                 <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
                   <!-- Use the formatDate method for the date field -->
-                  {{ header.key === 'rackStartupDate' ? formatDate(item[header.key]) : item[header.key] }}
+                  {{ (header.key === 'rackStartupDate' || header.key === 'startupDate') ? formatDate(item[header.key]) : item[header.key] }}
                 </td>
                 <td>
                   <v-btn icon @click="editItem(item)">
@@ -67,8 +67,8 @@
                   ></v-select>
                 </v-card-text>
                 <v-card-actions>
-                  <v-btn color="primary" @click="closeDialog">Cancel</v-btn>
-                  <v-btn color="primary" @click="saveData">Save</v-btn>
+                  <v-btn color="primary" @click="closeDialog">Annuller</v-btn>
+                  <v-btn color="primary" @click="saveData">Gem</v-btn>
                 </v-card-actions>
               </v-card>
             </template>
@@ -236,21 +236,21 @@ const headers = computed(() => ({
     { title: 'Status', key: 'rackStatus' },
     { title: 'Højde(Unit)', key: 'totalUnits' },
     { title: 'Ledige', key: 'availableUnits' },
-    { title: 'Actions', key: 'actions', sortable: false }
+    { title: 'Handlinger', key: 'actions', sortable: false }
   ],
   Company: [
     //{ title: 'Virksomheds ID', key: 'companyID' },
     { title: 'Navn', key: 'name' },
     { title: 'Beskrivelse', key: 'description' },
-    { title: 'Actions', key: 'actions', sortable: false }
+    { title: 'Handlinger', key: 'actions', sortable: false }
   ],
   DataCenter: [
     //{ title: 'DataCenter ID', key: 'dataCenterID' },
-    { title: 'Navn', key: 'name' },
+    { title: 'Virksomhed', key: 'companyName' },
     { title: 'Adresse', key: 'address' },
+    { title: 'Navn', key: 'name' },
     { title: 'Beskrivelse', key: 'description' },
-    { title: 'Virksomheds ID', key: 'companyID' },
-    { title: 'Actions', key: 'actions', sortable: false }
+    { title: 'Handlinger', key: 'actions', sortable: false }
   ],
   ServerRoom: [
     //{ title: 'ServerRoom ID', key: 'id' },
@@ -258,7 +258,7 @@ const headers = computed(() => ({
     { title: 'Navn', key: 'serverRoomName'}, 
     { title: 'Opstart', key: 'startupDate'},
     { title: 'Rack kapacitet', key: 'rackCapacity'},
-    { title: 'Actions', key: 'actions', sortable: false }
+    { title: 'Handlinger', key: 'actions', sortable: false }
 
   ]
 }));
@@ -270,7 +270,15 @@ const idFieldMapping = {
   ServerRoom: 'serverRoomID'
 };
 
-const activeTypeLabel = computed(() => activeType.value);
+const activeTypeLabel = computed(() => {
+  const labels = {
+    'DataRack': 'Datarack',
+    'Company': 'Virksomhed',
+    'DataCenter': 'Datacenter',
+    'ServerRoom': 'Serverrum'
+  };
+  return labels[activeType.value] || activeType.value;
+});
 
 function setActiveDataType(type) {
   dataStore.setActiveType(type);

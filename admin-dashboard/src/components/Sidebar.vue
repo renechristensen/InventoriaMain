@@ -51,11 +51,11 @@ const menuItems = [
   { title: 'Brugere', icon: 'mdi-account', route: '/users' },
   { title: 'Alarmer', icon:'mdi-alert', route: '/alerts'},
   { title: 'Miljø', icon: 'mdi-earth', route: '/environment' },
-  { title: 'Logout', icon: 'mdi-exit-to-app', route: '/logout' },
+  { title: 'Log ud', icon: 'mdi-exit-to-app', route: '/logout' },
 ];
 
 const handleNavigation = (route, title) => {
-  if (title === 'Logout') {
+  if (route === 'logout') {
     authStore.logout(); 
     router.push('/login');
   } else {

@@ -46,7 +46,7 @@
               <v-card>
                 <v-card-title>{{ isEditMode ? 'Rediger Bruger' : 'Opret Bruger' }}</v-card-title>
                 <v-card-text>
-                  <v-text-field label="Display Navn" v-model="displayName" required outlined></v-text-field>
+                  <v-text-field label="Alias" v-model="displayName" required outlined></v-text-field>
                   <v-text-field label="Arbejds Email" v-model="studieEmail" required outlined :rules="emailRules"></v-text-field>
                   <v-text-field label="Kodeord" v-model="password" type="password" required outlined :rules="passwordRules"></v-text-field>
                   <v-select 
@@ -131,16 +131,16 @@ const activeTypeLabel = computed(() => activeType.value === 'User' ? 'Brugere' :
 
 const headers = computed(() => ({
   User: [
-    { title: 'Display Navn', key: 'displayname' },
+    { title: 'Alias', key: 'displayname' },
     { title: 'Arbejds Email', key: 'studieEmail' },
     { title: 'Virksomhed', key: 'companyName' },
     { title: 'Sidste login', key: 'lastLoginDate' },
     { title: 'Roller', key: 'roles' },
-    { title: 'Actions', key: 'actions', sortable: false }
+    { title: 'Handlinger', key: 'actions', sortable: false }
   ],
   Role: [
     { title: 'Rolle Titel', key: 'roleName' },
-    { title: 'Actions', key: 'actions', sortable: false }
+    { title: 'Handlinger', key: 'actions', sortable: false }
   ]
 }));
 

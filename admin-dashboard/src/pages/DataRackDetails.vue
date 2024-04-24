@@ -27,35 +27,35 @@
           </v-row>
             
         <div>
-          {{ dataStore.data['RackUnit'] }}
+          <!--{{ dataStore.data['RackUnit'] }}-->
         </div>
 
           <!-- Data table for data display -->
           <v-row>
             <v-col cols="12">
               <v-data-table
-  :headers="dataUnitTableHeaders"
-  :items="dataStore.data['RackUnit']"
-  class="elevation-1"
->
-  <template v-slot:item="{ item }">
-    <tr :class="getRowClass(item)">
-      <td v-for="header in dataUnitTableHeaders" :key="header.key">
-        {{ item[header.key] }}
-      </td>
-      <!-- Conditional rendering of the Delete button -->
-      <td v-if="item.startDate && item.endDate">
-        <v-btn 
-          icon 
-          color="red"
-          @click="deleteReservation(item.rackUnitID, item.startDate, item.endDate)"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </td>
-    </tr>
-  </template>
-</v-data-table>
+                :headers="dataUnitTableHeaders"
+                :items="dataStore.data['RackUnit']"
+                class="elevation-1"
+              >
+                <template v-slot:item="{ item }">
+                  <tr :class="getRowClass(item)">
+                    <td v-for="header in dataUnitTableHeaders" :key="header.key">
+                      {{ item[header.key] }}
+                    </td>
+                    <!-- Conditional rendering of the Delete button -->
+                    <td v-if="item.startDate && item.endDate">
+                      <v-btn 
+                        icon 
+                        color="red"
+                        @click="deleteReservation(item.rackUnitID, item.startDate, item.endDate)"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </td>
+                  </tr>
+                </template>
+              </v-data-table>
             </v-col>
           </v-row>
         </div>
