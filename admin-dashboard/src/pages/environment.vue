@@ -43,10 +43,10 @@
               <v-card>
                 <v-card-title>{{ isEditMode ? 'Edit Environmental Reading' : 'Create Environmental Reading' }}</v-card-title>
                 <v-card-text>
-                  <v-text-field label="Temperature" v-model="temperature" required outlined></v-text-field>
-                  <v-text-field label="Humidity" v-model="humidity" required outlined></v-text-field>
+                  <v-text-field label="Temperatur" v-model="temperature" required outlined></v-text-field>
+                  <v-text-field label="Fugtighed" v-model="humidity" required outlined></v-text-field>
                   <v-text-field label="Timestamp" v-model="readingTimestamp" hint="Optional" persistent-hint outlined></v-text-field>
-                  <v-text-field label="Settings ID" v-model="environmentalSettingsID" required outlined></v-text-field>
+                  <v-text-field label="Settings id" v-model="environmentalSettingsID" required outlined></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                   <v-btn color="primary" @click="toggleDialog">Cancel</v-btn>
@@ -69,14 +69,14 @@
                     v-model="serverRoomID"
                     outlined
                   ></v-select>
-                  <v-text-field label="Temperature Upper Limit" v-model="temperatureUpperLimit" required outlined></v-text-field>
-                  <v-text-field label="Temperature Lower Limit" v-model="temperatureLowerLimit" required outlined></v-text-field>
-                  <v-text-field label="Humidity Upper Limit" v-model="humidityUpperLimit" required outlined></v-text-field>
-                  <v-text-field label="Humidity Lower Limit" v-model="humidityLowerLimit" required outlined></v-text-field>
+                  <v-text-field label="Temperatur Øvre Grænse" v-model="temperatureUpperLimit" required outlined></v-text-field>
+                  <v-text-field label="Temperatur Nedre Grænse" v-model="temperatureLowerLimit" required outlined></v-text-field>
+                  <v-text-field label="Luftfugtighed Øvre Grænse" v-model="humidityUpperLimit" required outlined></v-text-field>
+                  <v-text-field label="Luftfugtighed Nedre Grænse" v-model="humidityLowerLimit" required outlined></v-text-field>
                 </v-card-text>
                 <v-card-actions>
-                  <v-btn color="primary" @click="toggleDialog">Cancel</v-btn>
-                  <v-btn color="primary" @click="saveData">Save</v-btn>
+                  <v-btn color="primary" @click="toggleDialog">Annuller</v-btn>
+                  <v-btn color="primary" @click="saveData">Gem</v-btn>
                 </v-card-actions>
               </v-card>
             </template>

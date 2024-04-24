@@ -13,7 +13,7 @@
 
           <!-- Display Data -->
           <div>
-            {{ dataStore.data[activeType] }}
+            <!--{{ dataStore.data[activeType] }}-->
           </div>
 
           <!-- Searchable Data Table -->
@@ -48,7 +48,7 @@
                 <v-card-text>
                   <v-text-field label="Display Navn" v-model="displayName" required outlined></v-text-field>
                   <v-text-field label="Arbejds Email" v-model="studieEmail" required outlined :rules="emailRules"></v-text-field>
-                  <v-text-field label="Password" v-model="password" type="password" required outlined :rules="passwordRules"></v-text-field>
+                  <v-text-field label="Kodeord" v-model="password" type="password" required outlined :rules="passwordRules"></v-text-field>
                   <v-select 
                     label="Virksomhed" 
                     v-model="selectedCompanyID"
@@ -83,10 +83,10 @@
           <!-- Role Assignment Dialog -->
           <v-dialog v-model="roleDialogActive" max-width="500px">
             <v-card>
-              <v-card-title>Assign Role</v-card-title>
+              <v-card-title>Giv Bruger Rolle</v-card-title>
               <v-card-text>
                 <v-select 
-                  label="Select Role" 
+                  label="Vælg Rolle" 
                   v-model="selectedRole"
                   :items="roleItems"
                   item-title="roleName"
