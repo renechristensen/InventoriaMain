@@ -1,13 +1,39 @@
 <template>
   <v-container fluid>
+    <!-- Edit Dialog -->
+    <v-dialog v-model="editDialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Edit Data Rack</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field v-model="editData.datarackName" label="Data Rack Name" :rules="[v => !!v || 'Name is required']"></v-text-field>
+                <v-text-field v-model="editData.RackPlacement" label="Rack Placement" :rules="[v => !!v || 'Rack Placement is required']"></v-text-field>
+                <v-text-field v-model="editData.TotalUnits" type="number" label="Total Units" :rules="[v => v > 0 || 'Must be at least 1']"></v-text-field>
+                <v-text-field v-model="editData.AvailableUnits" type="number" label="Available Units" :rules="[v => v >= 0 || 'Cannot be negative']"></v-text-field>
+                <v-text-field v-model="editData.Status" label="Status" :rules="[v => !!v || 'Status is required']"></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeEditDialog">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="submitEditData">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-row>
       <Sidebar />
       <v-col cols="12">
         <div class="home-content">
           <!-- Action Buttons -->
           <div class="button-group">
-            <v-btn>Rediger adgangsrettigheder</v-btn>
-            <v-btn>Rediger</v-btn>
+            <v-btn @click="openEditDialog">Rediger adgangsrettigheder</v-btn>
+            <v-btn @click="openEditDialog">Rediger</v-btn>
           </div>
 
           <!-- Column layout for data display -->
@@ -47,11 +73,13 @@
                     <td v-if="item.startDate && item.endDate">
                       <v-btn 
                         icon 
-                        color="red"
                         @click="deleteReservation(item.rackUnitID, item.startDate, item.endDate)"
                       >
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
+                    </td>
+                    <!--styling issue, its being set to not show up so it doesn't set the backgroundcolor on the last part-->
+                    <td v-if="!item.startDate && !item.endDate">
                     </td>
                   </tr>
                 </template>
@@ -64,6 +92,7 @@
   </v-container>
 </template>
 
+
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
@@ -74,37 +103,65 @@ import { useDataRackStore } from '@/stores/dataRackStore';
 const router = useRouter();
 const dataRackStore = useDataRackStore();
 const dataStore = useDataStore();
-const activeType = ref('DataRack');
 
-// on startup, check if they are are trying to navigate here without having set a currentDataRackID, without first going through
-// the home page and selecting a datarack
+// Dialog state and editing data setup
+const editDialog = ref(false);
+const editData = ref({
+  datarackName: '',
+  RackPlacement: '',
+  TotalUnits: 0,
+  AvailableUnits: 0,
+  Status: ''
+});
+
+function openEditDialog() {
+  // This function is triggered when you want to open the dialog to edit a data rack.
+  if (dataRackStore.currentDataRackId && dataStore.data.dataRackByIDData) {
+    const currentData = dataStore.data.dataRackByIDData;
+    editData.value = {
+      datarackName: currentData.datarackName || '',
+      RackPlacement: currentData.rackPlacement || '',
+      TotalUnits: currentData.totalUnits || 0,
+      AvailableUnits: currentData.availableUnits || 0,
+      Status: currentData.rackStatus || ''
+    };
+  }
+  editDialog.value = true;
+}
+
+function closeEditDialog() {
+  editDialog.value = false;
+}
+
+async function submitEditData() {
+  // Submit the updated data through the store
+  try {
+    const payload = { id: dataRackStore.currentDataRackId, ...editData.value };
+    await dataStore.updateData('DataRack', payload);
+    await dataStore.fetchDataById('DataRack', dataRackStore.currentDataRackId); // Refresh the details
+    alert('Data Rack updated successfully');
+    closeEditDialog();
+  } catch (error) {
+    console.error('Failed to update Data Rack:', error);
+    alert('Failed to update Data Rack');
+  }
+}
+
+// Ensure the needed data is fetched on component mount
 onMounted(async () => {
   if (!dataRackStore.currentDataRackId) {
     router.push('/home');
   } else {
-    await dataStore.fetchDataById(activeType.value, dataRackStore.currentDataRackId);
-    // getting all the rackunits from my database 
-    await dataStore.fetchDataById("RackUnit", dataRackStore.currentDataRackId);
+    await dataStore.fetchDataById('DataRack', dataRackStore.currentDataRackId);
+    await dataStore.fetchDataById('RackUnit', dataRackStore.currentDataRackId);
   }
 });
 
-// fixing some issues with how data is displayed
-const dataRackDetails = computed(() => {
-  return dataStore.data.dataRackByIDData || {};
-});
+// Computed properties for displaying data
+const dataRackDetails = computed(() => dataStore.data.dataRackByIDData || {});
+const formattedRoles = computed(() => dataRackDetails.value.roles ? dataRackDetails.value.roles.join(", ") : "");
+const formattedDate = computed(() => dataRackDetails.value.rackStartupDate ? new Date(dataRackDetails.value.rackStartupDate).toLocaleDateString('en-GB') : "");
 
-const formattedRoles = computed(() => {
-  return dataRackDetails.value.roles ? dataRackDetails.value.roles.join(", ") : "";
-});
-
-const formattedDate = computed(() => {
-  if (dataRackDetails.value.rackStartupDate) {
-    return new Date(dataRackDetails.value.rackStartupDate).toLocaleDateString('en-GB');
-  }
-  return "";
-});
-
-// this is for the card's headers
 const headersMap = {
   'rackPlacement': 'Placering',
   'dataRackID' : 'DatabaseID',
@@ -119,7 +176,6 @@ const headersMap = {
   'roles': 'RolleAdgang'
 };
 
-// dataunit table headers for the 
 const dataUnitTableHeaders = computed(() => [
   { title: 'Unit', key: "unitNumber"},
   { title: 'Res', key: "displayName"},
@@ -140,15 +196,13 @@ function getRowClass(item) {
   return 'green-row';
 }
 
-
 function deleteReservation(rackUnitID, startDate, endDate) {
   const confirmed = window.confirm(`Are you sure you want to delete the reservation for Rack Unit ID ${rackUnitID} from ${startDate} to ${endDate}?`);
   if (confirmed) {
     dataStore.deleteReservationsByRackUnit(rackUnitID, startDate, endDate)
       .then(() => {
         alert('Reservation deleted successfully.');
-        // Optionally fetch data again if needed
-        dataStore.fetchData('RackUnit');
+        dataStore.fetchData('RackUnit'); // Optionally fetch data again if needed
       })
       .catch(error => {
         console.error('Failed to delete reservation:', error);
@@ -156,9 +210,8 @@ function deleteReservation(rackUnitID, startDate, endDate) {
       });
   }
 }
-
-
 </script>
+
 
 <style scoped>
 .home-content {
