@@ -55,7 +55,7 @@ const menuItems = [
 ];
 
 const handleNavigation = (route, title) => {
-  if (route === 'logout') {
+  if (route === '/logout') {
     authStore.logout(); 
     router.push('/login');
   } else {
@@ -64,6 +64,7 @@ const handleNavigation = (route, title) => {
 };
 
 const sidebarWidth = computed(() => isExpanded.value ? '200px' : '70px');
+
 </script>
 
 
