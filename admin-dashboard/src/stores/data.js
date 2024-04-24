@@ -40,11 +40,13 @@ export const useDataStore = defineStore('data', {
     async fetchData(type) {
       const appStore = useAppStore();
       let url = `${appStore.apiUrl}/api/${type}`;
-      if (type === "User") {
-        url = `${appStore.apiUrl}/api/User/GetAllUsers`;
-      }
-      else if(type === "Role"){
-        url = `${appStore.apiUrl}/api/Role/GetAllRoles`;
+      switch(type) {
+        case "User":
+          url = `${appStore.apiUrl}/api/User/GetAllUsers`;
+          break;
+        case "Role":
+          url = `${appStore.apiUrl}/api/Role/GetAllRoles`;
+          break;
       }
       try {
         const response = await axios.get(url);

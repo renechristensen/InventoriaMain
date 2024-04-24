@@ -48,8 +48,9 @@ const toggleSidebar = () => {
 
 const menuItems = [
   { title: 'Hjem', icon: 'mdi-view-dashboard', route: '/home' },
-  { title: 'Maskiner', icon: 'mdi-cog', route: '/machines' },
   { title: 'Brugere', icon: 'mdi-account', route: '/users' },
+  { title: 'Alarmer', icon:'mdi-alert', route: '/alerts'},
+  { title: 'Miljø', icon: 'mdi-earth', route: '/environment' },
   { title: 'Logout', icon: 'mdi-exit-to-app', route: '/logout' },
 ];
 
@@ -85,7 +86,7 @@ const sidebarWidth = computed(() => isExpanded.value ? '200px' : '70px');
   display: flex;
   align-items: center;
   flex-grow: 1;
-  overflow: hidden; /* Ensures text does not overlap with toggle button */
+  overflow: hidden;
 }
 
 .logo {
