@@ -14,7 +14,7 @@
 
           <!-- Display Data -->
           <div>
-            {{ dataStore.data[activeType] }}
+            <!--{{ dataStore.data[activeType] }}-->
           </div>
 
           <!-- Searchable Data Table -->
@@ -22,7 +22,10 @@
             <template #item="{ item }">
               <tr>
                 <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
-                  {{ item[header.key] }}
+                  <!-- Handle date and boolean formatting inline -->
+                  {{ header.key === 'alertTimestamp' ? formatDate(item[header.key]) : 
+                     header.key === 'resolved' ? (item[header.key] ? 'Ja' : 'Nej') :
+                     item[header.key] }}
                 </td>
                 <td>
                   <v-btn icon @click="editItem(item)">
@@ -161,6 +164,10 @@ const idFieldMapping = {
   Alert: 'alertID',
   AlertType: 'alertTypeID'
 };
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 
 function editItem(item) {
   isEditMode.value = true;
