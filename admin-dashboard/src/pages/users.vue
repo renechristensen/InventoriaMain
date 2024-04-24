@@ -21,7 +21,7 @@
             <template #item="{ item }">
               <tr>
                 <td v-for="header in headers[activeType].filter(h => h.key !== 'actions')" :key="header.key">
-                  {{ item[header.key] }}
+                  {{ header.key === 'lastLoginDate' ? formatDate(item[header.key]) : item[header.key] }}
                 </td>
                 <td>
                   <v-btn icon @click="editItem(item)">
@@ -37,6 +37,7 @@
               </tr>
             </template>
           </v-data-table>
+
 
           <!-- Dialogs for Creating and Editing Users and Roles -->
           <v-dialog v-model="dialogIsActive" max-width="500px">
@@ -150,6 +151,10 @@ const companyItems = computed(() => {
   })) || [];
 });
 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 const roleItems = computed(() => {
   return dataStore.data['Role']?.map(role => ({
     roleName: role.roleName,
