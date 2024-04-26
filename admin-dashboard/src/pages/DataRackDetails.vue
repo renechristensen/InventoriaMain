@@ -40,7 +40,7 @@
                   v-model="selectedRoleId"
                   :items="roleItems"
                   item-title="roleName"
-                  item-key="roleID"
+                  item-value="roleID"
                   label="Select Role"
                   :rules="[v => !!v || 'A role is required']"
                 ></v-select>
@@ -207,6 +207,23 @@ onMounted(async () => {
     dataStore.setActiveType('Role');
   }
 });
+
+async function submitAccessPermissions() {
+  try {
+    const payload = {
+      dataRackID: dataRackStore.currentDataRackId,
+      roleID: selectedRoleId.value
+    };
+
+    console.log(payload);
+    await dataStore.createData('RackAccessPermission', payload);
+    alert('Access permissions updated successfully');
+    closeAccessPermissionsDialog();
+  } catch (error) {
+    console.error('Failed to update access permissions:', error);
+    alert('Failed to update access permissions');
+  }
+}
 
 
 // Computed properties for displaying data
