@@ -3,9 +3,9 @@
 #include <DHT.h>
 
 // WiFi credentials
-//const char* ssid = "Sde-Guest";
- const char* ssid = "NETGEAR51";
- const char* password = "manicdaisy646";
+const char* ssid = "Sde-Guest";
+// const char* ssid = "NETGEAR51";
+// const char* password = "manicdaisy646";
 // DHT Sensor
 #define DHTPIN 15          // Pin connected to the DHT sensor.
 #define DHTTYPE DHT22      // DHT 22
@@ -21,9 +21,9 @@ void setup() {
 
   // Connect to Wi-Fi
   Serial.print("Connecting to WiFi..");
-   WiFi.begin(ssid, password);
-  //WiFi.begin(ssid);
-  while (WiFi.status() != WL_CONNECTED) {
+  // WiFi.begin(ssid, password);
+  WiFi.begin(ssid);
+  //while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
   }
