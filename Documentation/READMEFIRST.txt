@@ -19,3 +19,7 @@ Setup pagekite
 3:Set it as a path in system variabels
 4: run pagekite.py https://localhost:7027 dragon723.pagekite.me
 4b: You will need your own kite, so instead of dragon723.pagekite.me it would be yourdomain.pagekite.me
+
+Perifere enheder
+1: Download Arduino IDE
+2: 

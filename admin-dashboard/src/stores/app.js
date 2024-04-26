@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useAppStore = defineStore('app', {
   state: () => ({
     isSidebarExpanded: localStorage.getItem("is_expanded") === "true" || false,
-    apiUrl: 'https://5953-91-101-203-112.ngrok-free.app'
+    apiUrl: 'https://outgoing-eminent-jennet.ngrok-free.app'
   }),
   actions: {
     toggleSidebar() {
