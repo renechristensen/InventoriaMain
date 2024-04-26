@@ -61,3 +61,6 @@ V 17.9.6
 
 
 Installed System.IdentityModel.Tokens.Jwt in maui
+
+https://dl.espressif.com/dl/package_esp32_index.json
+https://espressif.github.io/arduino-esp32/package_esp32_index.json
