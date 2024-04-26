@@ -62,6 +62,7 @@ export const useDataStore = defineStore('data', {
         url = `${appStore.apiUrl}/api/User/CreateUser`;
       }
       try {
+        console.log(url + " " + payload);
         const response = await axios.post(url, payload);
         this.fetchData(type);
       } catch (error) {

@@ -10,6 +10,8 @@ vue run serve
 Starting ngrok
 ngrok http https://localhost:7027
 
+pagekite.py https://localhost:7027 dragon723.pagekite.me
+https://dragon723.pagekite.me/
 Setting up vue project
 
 
@@ -56,3 +58,6 @@ Visual studio 2022
 V 17.8.6
 to 
 V 17.9.6
+
+
+Installed System.IdentityModel.Tokens.Jwt in maui
