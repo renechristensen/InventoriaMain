@@ -12,14 +12,18 @@ Setup ngrok
 1: Download ngrok agent fra hjemmesiden
 2: Sæt dit authtoken efter at have startet executive. Her bliver i nødt til at bruge jeres eget hvis i gerne vil have jeres egen version, man kan sætte en gratis konto op
 3: kør ngrok http https://localhost:7027 som gratis konto
-4: med betalt konto kører jeg ngrok http --domain=outgoing-eminent-jennet.ngrok-free.app https://localhost:7027, hvor i skal bruge jeres eget domæne
+4: med betalt konto kører jeg 
+ngrok http --domain=outgoing-eminent-jennet.ngrok-free.app https://localhost:7027
+, hvor i skal bruge jeres eget domæne
 5: Bemærk at jeg har sat ngrok som en path, hvis I ikke har det skal i gå til folderen hvor i lagde det
 
 Setup pagekite
 1:download python 2.718 - python 3 fungerer ikke med kite
 2:Download pagekite.py and sæt det op i path, systemvariablen
 
-3: run pagekite.py https://localhost:7027 dragon723.pagekite.me
+3: kør
+pagekite.py https://localhost:7027 dragon723.pagekite.me
+i kommandoprompt
 3b: Du skal oprette din egen kite for at kunne gøre dette, så i stedet for dragon723.pagekite.me vil det være ditdomænenavn.pagekite.me
 
 Perifere enheder
