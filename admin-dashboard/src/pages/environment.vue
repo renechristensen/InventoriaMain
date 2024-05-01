@@ -117,13 +117,14 @@ const activeTypeLabel = computed(() => {
 
 const headers = computed(() => ({
   EnvironmentalReading: [
+  { title: 'Lokale', key: 'serverRoomName' },
     { title: 'Temperatur', key: 'temperature' },
     { title: 'Luftfugtighed', key: 'humidity' },
     { title: 'Tidspunkt', key: 'readingTimestamp' },
     { title: 'Handlinger', key: 'actions', sortable: false }
   ],
   EnvironmentalSetting: [
-    { title: 'Lokal', key: 'serverRoomName' },
+    { title: 'Lokale', key: 'serverRoomName' },
     { title: 'Temperatur Øvre Grænse', key: 'temperatureUpperLimit' },
     { title: 'Temperature Nedre Grænse', key: 'temperatureLowerLimit' },
     { title: 'Luftfugtighed Øvre Grænse', key: 'humidityUpperLimit' },
